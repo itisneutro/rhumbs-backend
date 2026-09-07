@@ -12,5 +12,26 @@ services:
     volumes:
       - wind-rhumbs-data:/data
 
+  postgres:
+    image: postgres:18-alpine
+    container_name: wind-rhumbs-postgres
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - wind-rhumbs-db:/var/lib/postgresql
+
+  adminer:
+    image: adminer:latest
+    container_name: wind-rhumbs-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+
 volumes:
   wind-rhumbs-data:
+  wind-rhumbs-db:

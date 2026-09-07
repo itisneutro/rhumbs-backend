@@ -1,15 +1,27 @@
 import {
+  Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
+  Post,
   Query,
   Render,
+  Res,
 } from '@nestjs/common';
-import { WindRhumbsService } from './wind-rhumbs.service';
+import type { Response } from 'express';
+import { CURRENT_USER_ID, WindRhumbsService } from './wind-rhumbs.service';
 
-const MINIO_URL = 'http://localhost:9000/wind-rhumbs';
+// Пустое поле формы и нечисловой ввод дают null, а не 0: Number('') === 0.
+function toNumberOrNull(raw: string): number | null {
+  if (raw === undefined || raw.trim() === '') {
+    return null;
+  }
+
+  const parsed = Number(raw);
+
+  return Number.isNaN(parsed) ? null : parsed;
+}
 
 @Controller('rhumbs')
 export class WindRhumbsController {
@@ -17,58 +29,100 @@ export class WindRhumbsController {
 
   @Get()
   @Render('wind-tiles')
-  tiles(@Query('minAzimuth') minAzimuth?: string) {
+  async tiles(@Query('minAzimuth') minAzimuth?: string) {
     const parsed = Number(minAzimuth);
     const threshold =
       minAzimuth === undefined || minAzimuth === '' || Number.isNaN(parsed)
         ? 0
         : parsed;
 
-    const rhumbs = this.windRhumbs.findAll(threshold).map((rhumb) => ({
-      ...rhumb,
-      likesCount: rhumb.likes.length,
-    }));
+    const rhumbs = await this.windRhumbs.findPublished(threshold);
 
     return {
       rhumbs,
       minAzimuth: threshold,
-      minioUrl: MINIO_URL,
     };
   }
 
   @Get('draft')
   @Render('wind-draft')
-  draft() {
-    const rhumb = this.windRhumbs.findDraft();
-
-    if (!rhumb) {
-      throw new NotFoundException('Черновик румба не найден');
-    }
+  async draft() {
+    const rhumb = await this.windRhumbs.findDraftByUser(CURRENT_USER_ID);
 
     return {
       rhumb,
-      likesCount: rhumb.likes.length,
-      minioUrl: MINIO_URL,
+      likesCount: rhumb?.likesCount ?? 0,
     };
   }
 
-  @Get('feed/:id')
-  @Render('wind-feed')
-  feed(
-    @Param('id', ParseIntPipe) id: number,
-    @Query('next') next?: string,
-  ) {
-    const rhumb =
-      next === 'true' ? this.windRhumbs.findNext(id) : this.windRhumbs.findById(id);
+  // Черновик создаётся только по названию, фото и видео — кнопкой «Далее».
+  @Post('draft')
+  async createDraft(
+    @Body('name') name: string,
+    @Body('imageUrl') imageUrl: string,
+    @Body('videoUrl') videoUrl: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.windRhumbs.createDraft(name, imageUrl, videoUrl);
 
-    if (!rhumb) {
-      throw new NotFoundException('Румб ветра не найден');
+    res.redirect(302, '/rhumbs/draft');
+  }
+
+  // Публикация дозаполняет описание и оба азимута — кнопкой «Опубликовать».
+  @Post('publish')
+  async publishDraft(
+    @Body('description') description: string,
+    @Body('rhumbGeographicAzimuthDeg') geographic: string,
+    @Body('rhumbMagneticAzimuthDeg') magnetic: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const geographicDeg = toNumberOrNull(geographic);
+    const magneticDeg = toNumberOrNull(magnetic);
+
+    await this.windRhumbs.publishDraft(
+      description?.trim() ? description : null,
+      geographicDeg,
+      magneticDeg === null ? null : String(magneticDeg),
+    );
+
+    res.redirect(302, '/rhumbs');
+  }
+
+  // Логическое удаление с плитки — сырой SQL в сервисе, здесь только разбор формы.
+  @Post('remove')
+  async markDeleted(
+    @Body('id') rawId: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const id = toNumberOrNull(rawId);
+
+    if (id !== null) {
+      await this.windRhumbs.markDeleted(id);
     }
 
-    return {
+    res.redirect(302, '/rhumbs');
+  }
+
+  @Get('feed/:id')
+  async feed(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+    @Query('next') next?: string,
+  ): Promise<void> {
+    const targetId =
+      next === 'true' ? await this.windRhumbs.findNextPublishedId(id) : id;
+
+    const rhumb =
+      targetId === null ? null : await this.windRhumbs.findPublishedById(targetId);
+
+    if (!rhumb) {
+      res.redirect('/rhumbs');
+      return;
+    }
+
+    res.render('wind-feed', {
       rhumb,
-      likesCount: rhumb.likes.length,
-      minioUrl: MINIO_URL,
-    };
+      likesCount: rhumb.likesCount,
+    });
   }
 }

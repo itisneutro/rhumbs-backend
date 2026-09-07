@@ -158,12 +158,6 @@ body {
   line-height: 26px;
 }
 
-.wind-feed-short {
-  margin-left: 6px;
-  font-size: 14px;
-  color: var(--wind-accent);
-}
-
 .wind-feed-details {
   margin-top: 8px;
 }
@@ -351,14 +345,19 @@ body {
   overflow: hidden;
   background: var(--wind-surface);
   color: var(--wind-text);
-  text-decoration: none;
   transition: transform 0.15s linear, box-shadow 0.15s linear;
+}
+
+.wind-tile-link {
+  display: block;
+  color: var(--wind-text);
+  text-decoration: none;
 }
 
 .wind-tile-image {
   display: block;
   width: 171px;
-  height: 118px;
+  height: 88px;
   margin: 0;
   border: none;
   border-radius: 12px 12px 0 0;
@@ -386,6 +385,30 @@ body {
   color: var(--wind-muted);
 }
 
+.wind-tile-remove {
+  display: block;
+  margin: 0;
+}
+
+.wind-tile-remove-button {
+  display: block;
+  width: 171px;
+  height: 30px;
+  border: none;
+  border-radius: 0;
+  background: var(--wind-control);
+  color: var(--wind-muted);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s linear, color 0.15s linear;
+}
+
+.wind-tile-remove-button:hover {
+  background: var(--wind-accent);
+  color: var(--wind-text);
+}
+
 .wind-tile:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
@@ -403,23 +426,24 @@ body {
   position: absolute;
   left: 16px;
   width: 358px;
-  height: 102px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed rgba(208, 217, 224, 0.3); /* прозрачность от снятого с сайта #D0D9E0 */
+  height: 74px;
+  padding: 0 12px;
+  display: block;
+  border: 1px solid rgba(208, 217, 224, 0.18); /* прозрачность от снятого с сайта #D0D9E0 */
   border-radius: 12px;
+  background: var(--wind-surface);
   font-size: 15px;
+  font-family: inherit;
   color: var(--wind-text);
   transition: border-color 0.15s linear;
 }
 
 .wind-draft-slot--video {
-  top: 40px;
+  top: 39px;
 }
 
 .wind-draft-slot--cover {
-  top: 158px;
+  top: 144px;
 }
 
 .wind-draft-slot:hover {
@@ -434,20 +458,28 @@ body {
   color: var(--wind-muted);
 }
 
+.wind-draft-label--video {
+  top: 16px; /* базовая линия 29 */
+}
+
+.wind-draft-label--cover {
+  top: 121px; /* базовая линия 134 */
+}
+
 .wind-draft-label--name {
-  top: 281px; /* базовая линия 294 */
+  top: 225px; /* базовая линия 238 */
 }
 
 .wind-draft-label--description {
-  top: 367px; /* базовая линия 380 */
+  top: 311px; /* базовая линия 324 */
 }
 
 .wind-draft-label--geographic {
-  top: 615px; /* базовая линия 628 */
+  top: 559px; /* базовая линия 572 */
 }
 
 .wind-draft-label--magnetic {
-  top: 689px; /* базовая линия 702 */
+  top: 633px; /* базовая линия 646 */
 }
 
 .wind-draft-input {
@@ -465,15 +497,15 @@ body {
 }
 
 .wind-draft-input--name {
-  top: 304px;
+  top: 248px;
 }
 
 .wind-draft-input--geographic {
-  top: 638px;
+  top: 582px;
 }
 
 .wind-draft-input--magnetic {
-  top: 712px;
+  top: 656px;
 }
 
 /* высота 222 = 10 строк по 20px + паддинги 10+10 + рамка 1+1;
@@ -482,7 +514,7 @@ body {
 .wind-draft-area {
   position: absolute;
   left: 16px;
-  top: 390px;
+  top: 334px;
   width: 358px;
   height: 222px;
   padding: 10px 12px;
@@ -500,6 +532,26 @@ body {
 .wind-draft-input:hover,
 .wind-draft-area:hover {
   border-color: var(--wind-accent);
+}
+
+.wind-draft-submit {
+  position: absolute;
+  left: 16px;
+  top: 720px;
+  width: 358px;
+  height: 44px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--wind-accent);
+  color: var(--wind-bg);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s linear;
+}
+
+.wind-draft-submit:hover {
+  background: var(--wind-text);
 }
 
 /* ---------- Панель вкладок ---------- */

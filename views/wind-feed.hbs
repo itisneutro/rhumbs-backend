@@ -8,8 +8,8 @@
 <body>
   <main class="wind-screen">
     <video class="wind-feed-video"
-           src="{{minioUrl}}/{{rhumb.videoKey}}"
-           poster="{{minioUrl}}/{{rhumb.imageKey}}"
+           src="{{rhumb.videoUrl}}"
+           poster="{{rhumb.imageUrl}}"
            autoplay muted loop playsinline></video>
 
     <div class="wind-feed-shade"></div>
@@ -38,7 +38,7 @@
     </div>
 
     <div class="wind-feed-info">
-      <h1 class="wind-feed-name">{{rhumb.name}} <span class="wind-feed-short">{{rhumb.shortName}}</span></h1>
+      <h1 class="wind-feed-name">{{rhumb.name}}</h1>
 
       <details class="wind-feed-details">
         <summary class="wind-feed-summary">

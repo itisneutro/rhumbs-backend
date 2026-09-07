@@ -25,16 +25,22 @@
 
     <div class="wind-tiles-grid">
       {{#each rhumbs}}
-      <a class="wind-tile" href="/rhumbs/feed/{{this.id}}">
-        <img class="wind-tile-image" src="{{../minioUrl}}/{{this.imageKey}}" alt="">
-        <span class="wind-tile-name">{{this.name}}</span>
-        <span class="wind-tile-likes">
-          <svg class="wind-icon-heart" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-            <path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/>
-          </svg>
-          {{this.likesCount}}
-        </span>
-      </a>
+      <div class="wind-tile">
+        <a class="wind-tile-link" href="/rhumbs/feed/{{this.id}}">
+          <img class="wind-tile-image" src="{{this.imageUrl}}" alt="">
+          <span class="wind-tile-name">{{this.name}}</span>
+          <span class="wind-tile-likes">
+            <svg class="wind-icon-heart" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/>
+            </svg>
+            {{this.likesCount}}
+          </span>
+        </a>
+        <form class="wind-tile-remove" method="POST" action="/rhumbs/remove">
+          <input type="hidden" name="id" value="{{this.id}}">
+          <button class="wind-tile-remove-button" type="submit">Удалить</button>
+        </form>
+      </div>
       {{else}}
       <p class="wind-tiles-empty">Румбы с таким азимутом не найдены</p>
       {{/each}}

@@ -1,34 +1,150 @@
 import { Injectable } from '@nestjs/common';
-import { WindRhumb } from './wind-rhumb.interface';
-import { WIND_RHUMBS } from './wind-rhumbs.data';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RhumbLike } from './entities/rhumb-like.entity';
+import { WindRhumb, WindRhumbStatus } from './entities/wind-rhumb.entity';
+
+// Авторизация появится в лабораторной 4, пока текущий пользователь фиксирован.
+export const CURRENT_USER_ID = 1;
+
+type WindRhumbWithLikes = WindRhumb & { likesCount: number };
 
 @Injectable()
 export class WindRhumbsService {
-  private readonly rhumbs: WindRhumb[] = WIND_RHUMBS;
+  constructor(
+    @InjectRepository(WindRhumb)
+    private readonly windRhumbs: Repository<WindRhumb>,
+    @InjectRepository(RhumbLike)
+    private readonly rhumbLikes: Repository<RhumbLike>,
+  ) {}
 
-  findAll(minAzimuth = 0): WindRhumb[] {
-    return this.rhumbs.filter(
-      (rhumb) =>
-        rhumb.status === 'published' &&
-        rhumb.rhumbGeographicAzimuthDeg >= minAzimuth,
-    );
+  async findPublished(minAzimuth?: number): Promise<WindRhumbWithLikes[]> {
+    const query = this.windRhumbs
+      .createQueryBuilder('rhumb')
+      .leftJoin(RhumbLike, 'rhumbLike', 'rhumbLike.rhumbId = rhumb.id')
+      .addSelect('COUNT(rhumbLike.id)', 'likesCount')
+      .where('rhumb.status = :status', { status: 'published' })
+      .groupBy('rhumb.id')
+      .orderBy('rhumb.rhumbGeographicAzimuthDeg', 'ASC');
+
+    if (minAzimuth !== undefined && Number.isFinite(minAzimuth)) {
+      query.andWhere('rhumb.rhumbGeographicAzimuthDeg >= :minAzimuth', {
+        minAzimuth,
+      });
+    }
+
+    const { entities, raw } = await query.getRawAndEntities<{
+      likesCount: string;
+    }>();
+
+    return entities.map((rhumb, index) => ({
+      ...rhumb,
+      likesCount: Number(raw[index].likesCount),
+    }));
   }
 
-  findById(id: number): WindRhumb | undefined {
-    return this.rhumbs.find(
-      (rhumb) => rhumb.id === id && rhumb.status !== 'deleted',
-    );
+  async findPublishedById(id: number): Promise<WindRhumbWithLikes | null> {
+    const rhumb = await this.windRhumbs.findOne({
+      where: { id, status: 'published' },
+    });
+
+    return rhumb ? this.withLikesCount(rhumb) : null;
   }
 
-  findNext(id: number): WindRhumb | undefined {
-    const published = this.rhumbs
-      .filter((rhumb) => rhumb.status === 'published')
-      .sort((left, right) => left.id - right.id);
+  async findNextPublishedId(currentId: number): Promise<number | null> {
+    const published = await this.windRhumbs.find({
+      where: { status: 'published' },
+      order: { rhumbGeographicAzimuthDeg: 'ASC' },
+      select: { id: true },
+    });
 
-    return published.find((rhumb) => rhumb.id > id) ?? published[0];
+    if (published.length === 0) {
+      return null;
+    }
+
+    const current = published.findIndex((rhumb) => rhumb.id === currentId);
+
+    return published[(current + 1) % published.length].id;
   }
 
-  findDraft(): WindRhumb | undefined {
-    return this.rhumbs.find((rhumb) => rhumb.status === 'draft');
+  async findDraftByUser(userId: number): Promise<WindRhumbWithLikes | null> {
+    const rhumb = await this.windRhumbs.findOne({
+      where: { status: 'draft', creatorId: userId },
+    });
+
+    return rhumb ? this.withLikesCount(rhumb) : null;
+  }
+
+  async createDraft(
+    name: string,
+    imageUrl: string,
+    videoUrl: string,
+  ): Promise<WindRhumb> {
+    const existing = await this.findDraftByUser(CURRENT_USER_ID);
+
+    if (existing) {
+      return existing;
+    }
+
+    const draft = this.windRhumbs.create({
+      name,
+      imageUrl,
+      videoUrl,
+      status: 'draft',
+      creatorId: CURRENT_USER_ID,
+      description: null,
+      rhumbGeographicAzimuthDeg: null,
+      rhumbMagneticAzimuthDeg: null,
+      formedAt: null,
+    });
+
+    return this.windRhumbs.save(draft);
+  }
+
+  async publishDraft(
+    description: string | null,
+    rhumbGeographicAzimuthDeg: number | null,
+    rhumbMagneticAzimuthDeg: string | null,
+  ): Promise<void> {
+    const draft = await this.windRhumbs.findOne({
+      where: { status: 'draft', creatorId: CURRENT_USER_ID },
+    });
+
+    if (!draft) {
+      return;
+    }
+
+    draft.description = description;
+    draft.rhumbGeographicAzimuthDeg = rhumbGeographicAzimuthDeg;
+    draft.rhumbMagneticAzimuthDeg = rhumbMagneticAzimuthDeg;
+    draft.status = 'published';
+    draft.formedAt = new Date();
+
+    await this.windRhumbs.save(draft);
+  }
+
+  // Единственный метод мимо ORM: логическое удаление сырым SQL по заданию.
+  // Идентификатор идёт параметром $1, в текст запроса не подставляется.
+  async markDeleted(
+    id: number,
+  ): Promise<{ id: number; status: WindRhumbStatus } | null> {
+    const rows = (await this.windRhumbs.query(
+      `UPDATE wind_rhumbs
+          SET status = 'deleted'
+        WHERE id = $1
+          AND status = 'published'
+      RETURNING id, status`,
+      [id],
+    )) as { id: number; status: WindRhumbStatus }[];
+
+    return rows[0] ?? null;
+  }
+
+  private async withLikesCount(rhumb: WindRhumb): Promise<WindRhumbWithLikes> {
+    const likesCount = await this.rhumbLikes.count({
+      where: { rhumbId: rhumb.id },
+    });
+
+    return { ...rhumb, likesCount };
   }
 }
