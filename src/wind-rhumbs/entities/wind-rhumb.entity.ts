@@ -20,11 +20,11 @@ export class WindRhumb {
   @Column({ name: 'description', type: 'varchar', length: 512, nullable: true })
   description: string | null;
 
-  @Column({ name: 'image_url', type: 'varchar', length: 256 })
-  imageUrl: string;
+  @Column({ name: 'image_url', type: 'varchar', length: 256, nullable: true })
+  imageUrl: string | null;
 
-  @Column({ name: 'video_url', type: 'varchar', length: 256 })
-  videoUrl: string;
+  @Column({ name: 'video_url', type: 'varchar', length: 256, nullable: true })
+  videoUrl: string | null;
 
   @Column({
     name: 'status',

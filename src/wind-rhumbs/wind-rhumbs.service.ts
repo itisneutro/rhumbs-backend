@@ -68,18 +68,20 @@ export class WindRhumbsService {
   }
 
   async findDraftByUser(userId: number): Promise<WindRhumbWithLikes | null> {
+    // Актуальным считается первый созданный черновик: без order выбор строки
+    // непредсказуем, если черновиков у пользователя оказалось несколько.
     const rhumb = await this.windRhumbs.findOne({
       where: { status: 'draft', creatorId: userId },
+      order: { id: 'ASC' },
     });
 
     return rhumb ? this.withLikesCount(rhumb) : null;
   }
 
-  async createDraft(
-    name: string,
-    imageUrl: string,
-    videoUrl: string,
-  ): Promise<WindRhumb> {
+  // Фото и видео в этой лабораторной на сервер не передаются и в БД
+  // не сохраняются: оба адреса пишутся пустыми, вместо них показывается
+  // файл по умолчанию с SSR-сервера.
+  async createDraft(name: string): Promise<WindRhumb> {
     const existing = await this.findDraftByUser(CURRENT_USER_ID);
 
     if (existing) {
@@ -88,8 +90,8 @@ export class WindRhumbsService {
 
     const draft = this.windRhumbs.create({
       name,
-      imageUrl,
-      videoUrl,
+      imageUrl: null,
+      videoUrl: null,
       status: 'draft',
       creatorId: CURRENT_USER_ID,
       description: null,

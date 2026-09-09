@@ -23,6 +23,10 @@ function toNumberOrNull(raw: string): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
+// Фото и видео по умолчанию отдаются с SSR-сервера из public/.
+const DEFAULT_IMAGE_URL = '/wind-rhumb-default.jpg';
+const DEFAULT_VIDEO_URL = '/wind-rhumb-default.mp4';
+
 @Controller('rhumbs')
 export class WindRhumbsController {
   constructor(private readonly windRhumbs: WindRhumbsService) {}
@@ -41,6 +45,7 @@ export class WindRhumbsController {
     return {
       rhumbs,
       minAzimuth: threshold,
+      defaultImageUrl: DEFAULT_IMAGE_URL,
     };
   }
 
@@ -59,11 +64,9 @@ export class WindRhumbsController {
   @Post('draft')
   async createDraft(
     @Body('name') name: string,
-    @Body('imageUrl') imageUrl: string,
-    @Body('videoUrl') videoUrl: string,
     @Res() res: Response,
   ): Promise<void> {
-    await this.windRhumbs.createDraft(name, imageUrl, videoUrl);
+    await this.windRhumbs.createDraft(name);
 
     res.redirect(302, '/rhumbs/draft');
   }
@@ -123,6 +126,8 @@ export class WindRhumbsController {
     res.render('wind-feed', {
       rhumb,
       likesCount: rhumb.likesCount,
+      defaultImageUrl: DEFAULT_IMAGE_URL,
+      defaultVideoUrl: DEFAULT_VIDEO_URL,
     });
   }
 }

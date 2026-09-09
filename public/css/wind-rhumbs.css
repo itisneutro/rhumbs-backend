@@ -365,6 +365,12 @@ body {
   background: var(--wind-bg);
 }
 
+/* object — строчный замещаемый элемент и не обрезает вложенное содержимое сам,
+   поэтому обложке на плитке нужен явный блочный бокс с обрезкой */
+object.wind-tile-image {
+  overflow: hidden;
+}
+
 .wind-tile-name {
   display: block;
   padding: 8px 10px 0 10px;

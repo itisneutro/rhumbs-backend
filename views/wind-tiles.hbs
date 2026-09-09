@@ -27,7 +27,13 @@
       {{#each rhumbs}}
       <div class="wind-tile">
         <a class="wind-tile-link" href="/rhumbs/feed/{{this.id}}">
-          <img class="wind-tile-image" src="{{this.imageUrl}}" alt="">
+          {{#if this.imageUrl}}
+          <object class="wind-tile-image" data="{{this.imageUrl}}" type="image/jpeg">
+            <img class="wind-tile-image" src="{{../defaultImageUrl}}" alt="">
+          </object>
+          {{else}}
+          <img class="wind-tile-image" src="{{../defaultImageUrl}}" alt="">
+          {{/if}}
           <span class="wind-tile-name">{{this.name}}</span>
           <span class="wind-tile-likes">
             <svg class="wind-icon-heart" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">

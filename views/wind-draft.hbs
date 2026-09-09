@@ -10,12 +10,12 @@
     <form method="POST" action="{{#if rhumb}}/rhumbs/publish{{else}}/rhumbs/draft{{/if}}">
       <label class="wind-draft-label wind-draft-label--video" for="rhumb-video-url">Адрес видео</label>
       <input class="wind-draft-slot wind-draft-slot--video"
-             id="rhumb-video-url" type="text" name="videoUrl"
+             id="rhumb-video-url" type="text"
              value="{{rhumb.videoUrl}}" placeholder="видео румба">
 
       <label class="wind-draft-label wind-draft-label--cover" for="rhumb-image-url">Адрес обложки</label>
       <input class="wind-draft-slot wind-draft-slot--cover"
-             id="rhumb-image-url" type="text" name="imageUrl"
+             id="rhumb-image-url" type="text"
              value="{{rhumb.imageUrl}}" placeholder="обложка румба">
 
       <label class="wind-draft-label wind-draft-label--name" for="rhumb-name">Название</label>
