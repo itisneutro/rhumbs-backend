@@ -34,11 +34,9 @@ export class WindRhumb {
   })
   status: WindRhumbStatus;
 
-  // географический азимут — целые градусы 0..315
   @Column({ name: 'rhumb_geographic_azimuth_deg', type: 'smallint', nullable: true })
   rhumbGeographicAzimuthDeg: number | null;
 
-  // магнитный азимут — градусы с десятой долей, склонение Москвы 11.5°
   @Column({
     name: 'rhumb_magnetic_azimuth_deg',
     type: 'numeric',
@@ -58,7 +56,6 @@ export class WindRhumb {
   @JoinColumn({ name: 'creator_id' })
   creator: User;
 
-  // дата формирования — проставляется при публикации, у черновика пуста
   @Column({ name: 'formed_at', type: 'timestamptz', nullable: true })
   formedAt: Date | null;
 }
