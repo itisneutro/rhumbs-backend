@@ -5,7 +5,7 @@ import { RhumbLike } from './entities/rhumb-like.entity';
 import { WindRhumb, WindRhumbStatus } from './entities/wind-rhumb.entity';
 
 // Авторизация появится в лабораторной 4, пока текущий пользователь фиксирован.
-export const CURRENT_USER_ID = 1;
+export const CURRENT_USER_ID = 4;
 
 type WindRhumbWithLikes = WindRhumb & { likesCount: number };
 
