@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>{{rhumb.name}}</title>
+  <link rel="stylesheet" href="/css/rhumbs.css">
+</head>
+<body>
+  <main class="rhumbs-screen">
+    {{> rhumbs_video class="rhumbs-feed__video" videoUrl=rhumb.videoUrl autoplay=true}}
+
+    <div class="rhumbs-feed__rail">
+      <div class="rhumbs-feed__azimuth">
+        <span class="rhumbs-feed__azimuth-value">{{rhumb.geographicAzimuthDeg}}°</span>
+        <span class="rhumbs-feed__azimuth-label">Географический</span>
+      </div>
+
+      <div class="rhumbs-feed__azimuth">
+        <span class="rhumbs-feed__azimuth-value">{{rhumb.magneticAzimuthDeg}}°</span>
+        <span class="rhumbs-feed__azimuth-label">Магнитный</span>
+      </div>
+
+      <div class="rhumbs-feed__likes">
+        <svg class="rhumbs-icon-heart" viewBox="0 0 24 24" width="36" height="36" aria-hidden="true"><path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/></svg>
+        <span class="rhumbs-feed__likes-count">{{likesCount}}</span>
+      </div>
+
+      <a class="rhumbs-feed__next" href="/rhumbs/feed/{{rhumb.id}}?next=1">
+        <svg class="rhumbs-icon-next" viewBox="0 0 24 24" width="36" height="36" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 5.6 5.4 4.4-5.4 4.4Z" fill="currentColor"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="rhumbs-feed__info">
+      <h1 class="rhumbs-feed__name">{{rhumb.name}}</h1>
+      <details class="rhumbs-feed__about"><summary class="rhumbs-feed__summary"><span class="rhumbs-feed__description">{{rhumb.description}}</span><span class="rhumbs-feed__more"></span></summary></details>
+    </div>
+
+    {{> rhumbs_tab_bar feedActive=true}}
+  </main>
+</body>
+</html>

@@ -1,0 +1,1 @@
+<video class="{{class}}" {{#if autoplay}}autoplay muted loop playsinline{{else}}preload="metadata" muted playsinline{{/if}}>{{#if videoUrl}}<source src="{{videoUrl}}{{#unless autoplay}}#t=0.5{{/unless}}" type="video/mp4">{{/if}}<source src="/rhumbs-default.mp4{{#unless autoplay}}#t=0.5{{/unless}}" type="video/mp4"></video>

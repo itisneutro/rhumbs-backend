@@ -18,7 +18,7 @@ JavaScript на страницах не используется.
 
 Маршруты:
 
-- `GET /rhumbs` — плитка, фильтр по параметру `minWindSpeed`
+- `GET /rhumbs` — плитка, фильтр по параметру `minAzimuth`
 - `GET /rhumbs/feed/:id` — лента, параметр `next=true` открывает следующий румб
 - `GET /rhumbs/draft` — единственный румб в статусе черновика
 
@@ -26,8 +26,8 @@ JavaScript на страницах не используется.
 
 Данные перенесены из оперативной памяти в PostgreSQL, массив-заглушка удалён.
 
-Три таблицы: `wind_rhumbs`, `users`, `rhumb_likes`. Каскадное удаление запрещено,
-все внешние ключи объявлены с `ON DELETE RESTRICT`. У `rhumb_likes` собственный
+Три таблицы: `rhumbs`, `users`, `rhumbs_likes`. Каскадное удаление запрещено,
+все внешние ключи объявлены с `ON DELETE RESTRICT`. У `rhumbs_likes` собственный
 первичный ключ и ограничение уникальности пары `user_id` и `rhumb_id`.
 
 Статус румба — перечислимый тип: `draft`, `published`, `deleted`. Удаление
@@ -36,7 +36,8 @@ JavaScript на страницах не используется.
 Таблицы создаются отдельной командой миграции, `synchronize` отключён.
 
 Направление румба задаётся двумя полями — географический и магнитный азимут.
-Поля средней скорости ветра в модели нет.
+Поля средней скорости ветра в модели нет. Адреса изображения и видео обязательны:
+`NOT NULL DEFAULT ''`, пустая строка означает показ заглушки с SSR-сервера.
 
 Шесть HTTP-методов: три GET, POST создания черновика и POST публикации через ORM,
 POST логического удаления сырым SQL `UPDATE` без ORM.
@@ -47,8 +48,8 @@ POST логического удаления сырым SQL `UPDATE` без ORM.
 - `GET /rhumbs/feed/:id` — лента, параметр `next=true` открывает следующий румб
 - `GET /rhumbs/draft` — страница добавления с черновиком пользователя
 - `POST /rhumbs/draft` — создание черновика, через ORM
-- `POST /rhumbs/publish` — публикация черновика, через ORM
-- `POST /rhumbs/remove` — логическое удаление, сырым SQL `UPDATE`
+- `POST /rhumbs/:id/publish` — публикация черновика, через ORM
+- `POST /rhumbs/:id/delete` — логическое удаление, сырым SQL `UPDATE`
 
 Панель администрирования — Adminer на порту 8081.
 
@@ -58,8 +59,15 @@ POST логического удаления сырым SQL `UPDATE` без ORM.
 npm install
 docker compose up -d
 npm run migrate
+npm run seed
 npm run start:dev
 ```
+
+Проект Compose называется `rhumbs`, тома — `rhumbs_rhumbs-data` и
+`rhumbs_rhumbs-db`. `npm run migrate` прогоняет миграции TypeORM из
+`src/migrations`, `synchronize` выключен. `npm run seed` заливает
+`scripts/seed.sql`, `npm run reset` возвращает базу к состоянию сида
+перед показом.
 
 Приложение — http://localhost:3000/rhumbs
 Консоль Minio — http://localhost:9001
@@ -67,5 +75,5 @@ Adminer — http://localhost:8081
 
 ## Ветки
 
-Под каждую лабораторную своя ветка: `wind-rhumbs-catalog-lab1`,
-`wind-rhumbs-storage-lab2`, далее по спринтам.
+Репозиторий — `rhumbs-backend`. Под каждую лабораторную своя ветка:
+`rhumbs-catalog-lab1`, `rhumbs-storage-lab2`, далее по спринтам.

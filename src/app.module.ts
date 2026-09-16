@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { WindRhumbsModule } from './wind-rhumbs/wind-rhumbs.module';
+import { RhumbsModule } from './rhumbs/rhumbs.module';
 
 @Module({
   imports: [
@@ -17,9 +17,11 @@ import { WindRhumbsModule } from './wind-rhumbs/wind-rhumbs.module';
         database: config.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: false,
+        // в разработке SQL виден в консоли
+        logging: ['query'],
       }),
     }),
-    WindRhumbsModule,
+    RhumbsModule,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Румбы ветра</title>
+  <link rel="stylesheet" href="/css/rhumbs.css">
+</head>
+<body>
+  <main class="rhumbs-screen">
+    <h1 class="rhumbs-tiles__title">Румбы ветра</h1>
+
+    <form class="rhumbs-tiles__filter" method="GET" action="/rhumbs">
+      <label class="rhumbs-tiles__filter-label" for="minAzimuth">Азимут от</label>
+      <input class="rhumbs-tiles__filter-range"
+             id="minAzimuth"
+             type="range"
+             name="minAzimuth"
+             min="0"
+             max="315"
+             step="45"
+             value="{{minAzimuth}}"
+             list="rhumbs-azimuths">
+      <datalist id="rhumbs-azimuths">
+        <option value="0"></option>
+        <option value="45"></option>
+        <option value="90"></option>
+        <option value="135"></option>
+        <option value="180"></option>
+        <option value="225"></option>
+        <option value="270"></option>
+        <option value="315"></option>
+      </datalist>
+      <span class="rhumbs-tiles__filter-value">{{minAzimuth}}°</span>
+      <button class="rhumbs-button rhumbs-button--small rhumbs-tiles__filter-button" type="submit">Найти</button>
+    </form>
+
+    <div class="rhumbs-tiles__grid">
+      {{#each rhumbs}}
+      <div class="rhumbs-tiles__tile">
+        <a class="rhumbs-tiles__link" href="/rhumbs/feed/{{this.id}}">
+          {{> rhumbs_image class="rhumbs-tiles__image" imageUrl=this.imageUrl}}
+          <span class="rhumbs-tiles__name">{{this.name}}</span>
+          <span class="rhumbs-tiles__azimuth">Географический {{this.geographicAzimuthDeg}}°</span>
+          <span class="rhumbs-tiles__azimuth">Магнитный {{this.magneticAzimuthDeg}}°</span>
+          <span class="rhumbs-tiles__likes">
+            <svg class="rhumbs-icon-heart" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/></svg>
+            <span class="rhumbs-tiles__likes-count">{{this.likesCount}}</span>
+          </span>
+        </a>
+        <form class="rhumbs-tiles__remove" method="POST" action="/rhumbs/{{this.id}}/delete">
+          <button class="rhumbs-button rhumbs-button--small rhumbs-tiles__remove-button" type="submit">Удалить</button>
+        </form>
+      </div>
+      {{else}}
+      <p class="rhumbs-tiles__empty">Румбы с таким азимутом не найдены</p>
+      {{/each}}
+    </div>
+
+    {{> rhumbs_tab_bar tilesActive=true}}
+  </main>
+</body>
+</html>

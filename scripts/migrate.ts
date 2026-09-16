@@ -1,29 +1,19 @@
-import 'reflect-metadata';
-import { config } from 'dotenv';
-import { DataSource } from 'typeorm';
-import { RhumbLike } from '../src/wind-rhumbs/entities/rhumb-like.entity';
-import { User } from '../src/wind-rhumbs/entities/user.entity';
-import { WindRhumb } from '../src/wind-rhumbs/entities/wind-rhumb.entity';
+import dataSource from './data-source';
 
-config();
-
-const dataSource = new DataSource({
-  type: 'postgres',
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  entities: [WindRhumb, User, RhumbLike],
-  synchronize: false,
-});
-
+// Таблицы создаёт миграция, synchronize не вызывается нигде.
 async function migrate(): Promise<void> {
   await dataSource.initialize();
-  await dataSource.synchronize();
+  const applied = await dataSource.runMigrations();
   await dataSource.destroy();
 
-  console.log('Таблицы wind_rhumbs, users, rhumb_likes созданы');
+  if (applied.length === 0) {
+    console.log('Новых миграций нет');
+    return;
+  }
+
+  for (const migration of applied) {
+    console.log(`Применена миграция ${migration.name}`);
+  }
 }
 
 migrate().catch((error) => {

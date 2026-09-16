@@ -6,7 +6,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
-describe('WindRhumbsController (e2e)', () => {
+describe('RhumbsController (e2e)', () => {
   let app: NestExpressApplication;
 
   beforeEach(async () => {

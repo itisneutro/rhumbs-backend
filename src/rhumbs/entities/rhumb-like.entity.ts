@@ -6,11 +6,11 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { Rhumb } from './rhumb.entity';
 import { User } from './user.entity';
-import { WindRhumb } from './wind-rhumb.entity';
 
-@Entity('rhumb_likes')
-@Unique('uq_rhumb_likes_user_rhumb', ['userId', 'rhumbId'])
+@Entity('rhumbs_likes')
+@Unique('uq_rhumbs_likes_user_rhumb', ['userId', 'rhumbId'])
 export class RhumbLike {
   @PrimaryGeneratedColumn({ type: 'integer', name: 'id' })
   id: number;
@@ -25,7 +25,7 @@ export class RhumbLike {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => WindRhumb, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => Rhumb, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'rhumb_id' })
-  rhumb: WindRhumb;
+  rhumb: Rhumb;
 }
