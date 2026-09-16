@@ -1,54 +1,62 @@
-/* Стилистика скопирована с windy.app
-   #172D38 — класс windy-map__ptcs-panel, панель слоёв
-   #233B4B — класс leaflet-popup-content-wrapper, карточка
-   #234658 — класс windy-map__logo-container, кнопки на карте
-   #4B6B92 — класс windy-map-2__hour selected, активный элемент
-   #D0D9E0 — класс windy-map-2__controls, светлый текст
-   Панель навигации взята из правой панели слоёв сайта */
+/* Стилистика взята с windfinder.com: из хедера сайта — кнопка, фон, текст,
+   карточка и панель навигации */
 
 :root {
-  --rhumbs-bg: #172D38;
-  --rhumbs-surface: #233B4B;
-  --rhumbs-control: #234658;
-  --rhumbs-accent: #4B6B92;
-  --rhumbs-text: #FFFFFF;
-  --rhumbs-muted: #D0D9E0;
-  --rhumbs-page: #060D11; /* затемнённый вариант --rhumbs-bg, подложка вокруг экрана */
+  --rhumbs-accent: #BF2828;  /* windfinder --wf-accent-700: логотип, заголовки, красные кнопки, активная дата */
+  --rhumbs-text: #121212;    /* --wf-text-primary: текст, полоса под активным пунктом хедера */
+  --rhumbs-bg: #FFFFFF;      /* --wf-bg-primary: фон страниц и хедера, белые круглые кнопки на карточках */
+  --rhumbs-border: #CCCCCC;  /* рамка полей ввода и карточек */
+  --rhumbs-surface: #F2F2F2; /* вспомогательный фон */
+  --rhumbs-muted: #656565;   /* вторичный текст, подписи */
+  --rhumbs-overlay: rgba(18, 18, 18, .6); /* подложка подписи поверх изображения на карточке */
 }
 
 * {
   box-sizing: border-box;
 }
 
-input,
-textarea,
-button {
-  outline: none;
-}
-
-html {
-  background: var(--rhumbs-page);
-}
-
 body {
   margin: 0;
-  padding: 0;
-  min-height: 844px;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  background: var(--rhumbs-page);
+  background: var(--rhumbs-bg);
   color: var(--rhumbs-text);
-  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 22px;
 }
 
+/* Экран 390×844: контент прокручивается внутри, панель вкладок прибита к низу */
 .rhumbs-screen {
   position: relative;
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
   width: 390px;
   height: 844px;
-  overflow: hidden;
+  padding: 0 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
   background: var(--rhumbs-bg);
+}
+
+/* полоса прокрутки не отнимает ширину у экрана */
+.rhumbs-screen::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Заголовки ---------- */
+
+.rhumbs-tiles__title,
+.rhumbs-draft__title,
+.rhumbs-missing__title {
+  flex-shrink: 0;
+  margin: 20px 0 14px 0;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--rhumbs-accent);
 }
 
 /* ---------- Общая кнопка ---------- */
@@ -58,21 +66,75 @@ body {
   align-items: center;
   justify-content: center;
   height: 44px;
-  padding: 0 16px;
-  border: 1px solid transparent;
-  border-radius: 12px;
+  margin: 0;
+  padding: 0 20px;
+  border: none;
+  border-radius: 22px;
   background: var(--rhumbs-accent);
-  color: var(--rhumbs-text);
-  font-size: 15px;
+  color: #FFFFFF;
   font-family: inherit;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
   cursor: pointer;
 }
 
 .rhumbs-button--small {
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 8px;
-  font-size: 12px;
+  height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+/* ---------- Панель вкладок ---------- */
+
+.rhumbs-tab-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-shrink: 0;
+  width: 390px;
+  height: 64px;
+  margin: auto -16px 0 -16px;
+  border-top: 1px solid var(--rhumbs-border);
+  background: var(--rhumbs-bg);
+}
+
+.rhumbs-tab-bar__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 130px;
+  height: 63px;
+  color: var(--rhumbs-text);
+  text-decoration: none;
+}
+
+.rhumbs-tab-bar__icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+/* прозрачная полоса у всех пунктов, чтобы активный не сдвигался по высоте */
+.rhumbs-tab-bar__label {
+  padding-bottom: 2px;
+  border-bottom: 3px solid transparent;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.rhumbs-tab-bar__tab--active .rhumbs-tab-bar__icon {
+  color: var(--rhumbs-accent);
+}
+
+.rhumbs-tab-bar__tab--active .rhumbs-tab-bar__label {
+  border-bottom-color: var(--rhumbs-text);
+  font-weight: 700;
 }
 
 /* ---------- Лента ---------- */
@@ -84,31 +146,46 @@ body {
   width: 390px;
   height: 780px;
   object-fit: cover;
-  background: var(--rhumbs-bg);
 }
 
+/* z-index у флекс-элемента поднимает колонку и подпись над видео и градиентом */
 .rhumbs-feed__rail {
-  position: absolute;
-  right: 16px;
-  bottom: 176px;
-  width: 96px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  color: var(--rhumbs-text);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  flex-shrink: 0;
+  gap: 12px;
+  margin-top: auto;
+  align-self: flex-end;
+  z-index: 1;
+}
+
+/* градиент на нижние 351px видео высотой 780px, под колонкой и подписью */
+.rhumbs-feed__rail::before {
+  content: "";
+  position: absolute;
+  top: 429px;
+  left: 0;
+  width: 390px;
+  height: 351px;
+  z-index: -1;
+  background: linear-gradient(transparent, rgba(18, 18, 18, .75));
 }
 
 .rhumbs-feed__azimuth {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .92);
 }
 
 .rhumbs-feed__azimuth-value {
-  font-size: 17px;
-  line-height: 20px;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--rhumbs-text);
 }
 
 .rhumbs-feed__azimuth-label {
@@ -122,47 +199,79 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--rhumbs-bg);
+  color: var(--rhumbs-accent);
+}
+
+.rhumbs-feed__heart {
+  display: block;
+  width: 30px;
+  height: 30px;
 }
 
 .rhumbs-feed__likes-count {
   position: absolute;
   top: 0;
   left: 0;
-  width: 36px;
-  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 2px;
+  width: 48px;
+  height: 48px;
   font-size: 12px;
-  color: var(--rhumbs-bg);
-  text-shadow: none;
+  line-height: 14px;
+  font-weight: 700;
+  color: #FFFFFF;
 }
 
 .rhumbs-feed__next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--rhumbs-bg);
+  color: var(--rhumbs-accent);
+}
+
+.rhumbs-feed__chevron {
   display: block;
-  color: var(--rhumbs-text);
-  text-decoration: none;
+  width: 24px;
+  height: 24px;
 }
 
 .rhumbs-feed__info {
-  position: absolute;
-  left: 16px;
-  bottom: 80px;
-  width: 246px;
-  color: var(--rhumbs-text);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 280px;
+  margin: 16px 0 16px 0;
+  z-index: 1;
+  color: #FFFFFF;
+}
+
+/* в ленте подпись сама стоит на 16px выше панели, свободное место забирает колонка */
+.rhumbs-feed__info + .rhumbs-tab-bar {
+  margin-top: 0;
 }
 
 .rhumbs-feed__name {
-  margin: 0 0 6px 0;
-  font-size: 20px;
-  line-height: 24px;
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.rhumbs-feed__about {
+  margin: 0;
 }
 
 .rhumbs-feed__summary {
+  display: block;
   list-style: none;
   cursor: pointer;
 }
@@ -178,7 +287,7 @@ body {
   overflow: hidden;
   font-size: 13px;
   line-height: 18px;
-  color: var(--rhumbs-muted);
+  color: rgba(255, 255, 255, .9);
 }
 
 .rhumbs-feed__about[open] .rhumbs-feed__description {
@@ -187,10 +296,11 @@ body {
 
 .rhumbs-feed__more {
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
   font-size: 13px;
   line-height: 18px;
-  color: var(--rhumbs-text);
+  font-weight: 700;
+  color: #FFFFFF;
 }
 
 .rhumbs-feed__more::after {
@@ -203,185 +313,246 @@ body {
 
 /* ---------- Плитка ---------- */
 
-.rhumbs-tiles__title {
-  margin: 0;
-  padding: 24px 16px 8px 16px;
-  font-size: 22px;
-  line-height: 28px;
-  color: var(--rhumbs-text);
-}
-
 .rhumbs-tiles__filter {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 8px;
-  padding: 0 16px 12px 16px;
+  margin: 0 0 14px 0;
 }
 
 .rhumbs-tiles__filter-label {
-  width: 66px;
-  white-space: nowrap;
-  font-size: 11px;
-  color: var(--rhumbs-muted);
-}
-
-.rhumbs-tiles__filter-range {
-  width: 136px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.rhumbs-tiles__filter-range::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 999px;
-  background: var(--rhumbs-control);
-}
-
-.rhumbs-tiles__filter-range::-webkit-slider-thumb {
-  width: 18px;
-  height: 18px;
-  margin-top: -6px;
-  border-radius: 999px;
-  background: var(--rhumbs-accent);
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.rhumbs-tiles__filter-value {
-  width: 40px;
   font-size: 13px;
+  line-height: 18px;
   color: var(--rhumbs-text);
 }
 
+/* собственный вид слайдера: нативный меняется при наведении, а hover запрещён */
+input[type="range"].rhumbs-tiles__filter-range {
+  width: 129px;
+  height: 22px;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"].rhumbs-tiles__filter-range:focus {
+  outline: none;
+}
+
+/* правила для webkit и firefox раздельные: чужой псевдоэлемент в списке
+   селекторов отменил бы всё правило */
+input[type="range"].rhumbs-tiles__filter-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rhumbs-border);
+}
+
+input[type="range"].rhumbs-tiles__filter-range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rhumbs-border);
+}
+
+input[type="range"].rhumbs-tiles__filter-range::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border: none;
+  border-radius: 9px;
+  background: var(--rhumbs-accent);
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 9px;
+  background: var(--rhumbs-accent);
+  box-shadow: none;
+}
+
+.rhumbs-tiles__filter-value {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 700;
+}
+
+/* значение стоит рядом со слайдером, «Найти» прижата к правому краю строки */
 .rhumbs-tiles__filter-button {
-  width: 92px;
-  padding: 0;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .rhumbs-tiles__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: 196px;
-  align-items: start;
-  gap: 16px;
-  padding: 0 16px 16px 16px;
-  max-height: 652px;
-  overflow-y: auto;
+  flex-shrink: 0;
+  gap: 12px;
+  margin: 0 0 16px 0;
 }
 
 .rhumbs-tiles__empty {
-  grid-column: 1 / -1;
+  grid-column: 1 / 3;
   margin: 40px 0 0 0;
   text-align: center;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--rhumbs-muted);
 }
 
 .rhumbs-tiles__tile {
-  width: 171px;
-  height: 196px;
+  display: flex;
+  flex-direction: column;
+  width: 173px;
   overflow: hidden;
-  border-radius: 12px;
-  background: var(--rhumbs-surface);
+  border: 1px solid var(--rhumbs-border);
+  border-radius: 8px;
+  background: #FFFFFF;
 }
 
 .rhumbs-tiles__link {
+  position: relative;
   display: block;
   color: var(--rhumbs-text);
   text-decoration: none;
 }
 
 .rhumbs-tiles__image {
+  position: relative;
   width: 171px;
-  height: 80px;
+  height: 150px;
+  background-color: var(--rhumbs-surface);
   background-size: cover;
   background-position: center;
 }
 
+/* градиент на нижнюю часть изображения, под названием */
+.rhumbs-tiles__image::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 171px;
+  height: 72px;
+  background: linear-gradient(transparent, var(--rhumbs-overlay));
+}
+
 .rhumbs-tiles__name {
-  display: block;
-  padding: 6px 8px 0 8px;
-  font-size: 13px;
-  line-height: 17px;
-  white-space: nowrap;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 151px;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
 }
 
 .rhumbs-tiles__azimuth {
-  display: block;
-  padding: 0 8px;
-  font-size: 11px;
-  line-height: 13px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.rhumbs-tiles__image + .rhumbs-tiles__azimuth {
+  margin-top: 10px;
+}
+
+.rhumbs-tiles__azimuth-label {
   color: var(--rhumbs-muted);
 }
 
+.rhumbs-tiles__azimuth-value {
+  font-weight: 700;
+  color: var(--rhumbs-text);
+}
+
 .rhumbs-tiles__likes {
-  position: relative;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--rhumbs-bg);
+  color: var(--rhumbs-accent);
+}
+
+.rhumbs-tiles__heart {
   display: block;
-  width: 30px;
-  height: 28px;
-  margin: 2px 0 0 6px;
+  width: 26px;
+  height: 26px;
 }
 
 .rhumbs-tiles__likes-count {
   position: absolute;
   top: 0;
   left: 0;
-  width: 30px;
-  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 1px;
+  width: 36px;
+  height: 36px;
   font-size: 11px;
-  color: var(--rhumbs-bg);
+  line-height: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
 }
 
 .rhumbs-tiles__remove {
-  display: block;
   margin: 0;
-  padding: 0 8px;
+  padding: 10px;
 }
 
 .rhumbs-tiles__remove-button {
-  width: 155px;
+  width: 151px;
 }
 
 /* ---------- Добавление ---------- */
 
-.rhumbs-draft__title {
-  margin: 0;
-  padding: 24px 16px 12px 16px;
-  font-size: 22px;
-  line-height: 28px;
-  color: var(--rhumbs-text);
-}
-
 .rhumbs-draft__form {
-  padding: 0 16px;
+  flex-shrink: 0;
+  margin: 0;
 }
 
 .rhumbs-draft__media {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  position: relative;
+  width: 358px;
+  height: 200px;
+}
+
+.rhumbs-draft__media + .rhumbs-draft__media {
+  margin-top: 12px;
 }
 
 .rhumbs-draft__preview {
-  width: 246px;
-  height: 120px;
-  border-radius: 12px;
-  background-color: var(--rhumbs-control);
+  display: block;
+  width: 358px;
+  height: 200px;
+  border: 1px solid var(--rhumbs-border);
+  border-radius: 8px;
+  background-color: var(--rhumbs-surface);
   background-size: cover;
   background-position: center;
   object-fit: cover;
+}
+
+/* «Выбрать» лежит поверх превью в правом нижнем углу */
+.rhumbs-draft__media > .rhumbs-button {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
 }
 
 /* input прячется визуально, но остаётся доступным для клика по подписи */
@@ -395,99 +566,68 @@ body {
 
 .rhumbs-draft__label {
   display: block;
-  margin-bottom: 4px;
+  margin: 14px 0 6px 0;
   font-size: 13px;
-  color: var(--rhumbs-muted);
-}
-
-.rhumbs-draft__input {
-  display: block;
-  width: 358px;
-  height: 40px;
-  margin-bottom: 12px;
-  padding: 0 12px;
-  border: 1px solid var(--rhumbs-control);
-  border-radius: 12px;
-  background: var(--rhumbs-surface);
+  line-height: 18px;
   color: var(--rhumbs-text);
-  font-size: 15px;
-  font-family: inherit;
 }
 
+.rhumbs-draft__input,
 .rhumbs-draft__area {
   display: block;
   width: 358px;
-  height: 96px;
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--rhumbs-control);
-  border-radius: 12px;
-  background: var(--rhumbs-surface);
+  height: 44px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--rhumbs-border);
+  border-radius: 4px;
+  background: #FFFFFF;
   color: var(--rhumbs-text);
-  font-size: 15px;
-  line-height: 20px;
   font-family: inherit;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.rhumbs-draft__area {
+  height: 96px;
+  padding: 10px 12px;
   resize: none;
 }
 
+.rhumbs-draft__input:focus,
+.rhumbs-draft__area:focus {
+  border-color: var(--rhumbs-text);
+  outline: none;
+}
+
+/* стрелки у полей азимутов скрыты */
+.rhumbs-draft__input::-webkit-outer-spin-button,
+.rhumbs-draft__input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.rhumbs-draft__input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .rhumbs-draft__submit {
+  display: flex;
   width: 358px;
+  margin: 20px 0 20px 0;
 }
 
 /* ---------- Румб не найден ---------- */
 
 .rhumbs-missing {
-  padding: 24px 16px 0 16px;
-}
-
-.rhumbs-missing__title {
-  margin: 0 0 8px 0;
-  font-size: 22px;
-  line-height: 28px;
-  color: var(--rhumbs-text);
+  flex-shrink: 0;
 }
 
 .rhumbs-missing__note {
   margin: 0;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--rhumbs-muted);
-}
-
-/* ---------- Панель вкладок ---------- */
-
-.rhumbs-tab-bar {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 390px;
-  height: 64px;
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid rgba(208, 217, 224, 0.18); /* прозрачность от снятого с сайта #D0D9E0 */
-  background: var(--rhumbs-surface);
-}
-
-.rhumbs-tab-bar__tab {
-  width: 96px;
-  height: 63px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  text-decoration: none;
+  font-size: 15px;
+  line-height: 22px;
   color: var(--rhumbs-text);
-}
-
-.rhumbs-tab-bar__icon {
-  display: block;
-}
-
-.rhumbs-tab-bar__label {
-  font-size: 11px;
-}
-
-.rhumbs-tab-bar__tab--active {
-  color: var(--rhumbs-accent);
 }

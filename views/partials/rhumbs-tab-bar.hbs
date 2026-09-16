@@ -1,22 +1,24 @@
 <nav class="rhumbs-tab-bar">
   <a class="rhumbs-tab-bar__tab{{#if feedActive}} rhumbs-tab-bar__tab--active{{/if}}" href="/rhumbs/feed/1">
-    <svg class="rhumbs-tab-bar__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-      <path fill="currentColor" fill-rule="evenodd" d="M5.5 3h13A2.5 2.5 0 0 1 21 5.5v13A2.5 2.5 0 0 1 18.5 21h-13A2.5 2.5 0 0 1 3 18.5v-13A2.5 2.5 0 0 1 5.5 3Zm4.5 5.4v7.2L16 12l-6-3.6Z"/>
+    <svg class="rhumbs-tab-bar__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="16" rx="2"/>
+      <path d="M10 8.5v7l5.5-3.5Z"/>
     </svg>
     <span class="rhumbs-tab-bar__label">Лента</span>
   </a>
   <a class="rhumbs-tab-bar__tab{{#if draftActive}} rhumbs-tab-bar__tab--active{{/if}}" href="/rhumbs/draft">
-    <svg class="rhumbs-tab-bar__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-      <path fill="currentColor" fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 5h2v4h4v2h-4v4h-2v-4H7v-2h4V7Z"/>
+    <svg class="rhumbs-tab-bar__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 8v8M8 12h8"/>
     </svg>
     <span class="rhumbs-tab-bar__label">Добавить</span>
   </a>
   <a class="rhumbs-tab-bar__tab{{#if tilesActive}} rhumbs-tab-bar__tab--active{{/if}}" href="/rhumbs">
-    <svg class="rhumbs-tab-bar__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-      <rect x="3" y="3" width="8" height="8" rx="1.5" fill="currentColor"/>
-      <rect x="13" y="3" width="8" height="8" rx="1.5" fill="currentColor"/>
-      <rect x="3" y="13" width="8" height="8" rx="1.5" fill="currentColor"/>
-      <rect x="13" y="13" width="8" height="8" rx="1.5" fill="currentColor"/>
+    <svg class="rhumbs-tab-bar__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+      <rect x="4" y="4" width="6.5" height="6.5" rx="1"/>
+      <rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/>
+      <rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/>
+      <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/>
     </svg>
     <span class="rhumbs-tab-bar__label">Плитка</span>
   </a>

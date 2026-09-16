@@ -17,8 +17,7 @@ import { RhumbsModule } from './rhumbs/rhumbs.module';
         database: config.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: false,
-        // в разработке SQL виден в консоли
-        logging: ['query'],
+        logging: false,
       }),
     }),
     RhumbsModule,

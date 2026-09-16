@@ -1,1 +1,1 @@
-<div class="{{class}}" style="background-image: {{#if imageUrl}}url('{{imageUrl}}'), {{/if}}url('/rhumbs-default.jpg')"></div>
+<div class="{{class}}" style="background-image: {{#if imageUrl}}url('{{imageUrl}}'), {{/if}}url('/rhumbs-default.jpg')">{{#if @partial-block}}{{> @partial-block}}{{/if}}</div>
