@@ -12,40 +12,42 @@ INSERT INTO users (id, login, password) VALUES (6, 'p.erokhin', 'rhumbs2026');
 -- Черновик принадлежит пользователю 5, чтобы у текущего пользователя
 -- (CURRENT_USER_ID = 4) черновика не было и страница добавления
 -- открывалась в состоянии с кнопкой «Далее».
+-- Магнитное склонение Москвы 11,5° восточное:
+-- магнитный азимут = (географический − 11,5) по модулю 360.
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (1, 'Северный', 'Ветер с севера. На путевом угле 130° даёт попутную составляющую около 0,64 скорости ветра и умеренный снос вправо. Время полёта Лондон–Париж сокращается.', 'http://localhost:9000/rhumbs/rhumbs-north.jpg', 'http://localhost:9000/rhumbs/rhumbs-north.mp4',
-        'published'::rhumb_status, 0, '358.8',
+        'published'::rhumb_status, 0, '348.5',
         '2026-02-14 07:05:00+00', 4, '2026-02-14 08:00:00+00');
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (2, 'Северо-восточный', 'Ветер с северо-востока. Угол к путевому близок к 95°, продольная составляющая почти нулевая. Время полёта меняется незначительно, основной эффект — боковой снос.', 'http://localhost:9000/rhumbs/rhumbs-north-east.jpg', 'http://localhost:9000/rhumbs/rhumbs-north-east.mp4',
-        'published'::rhumb_status, 45, '43.8',
+        'published'::rhumb_status, 45, '33.5',
         '2026-02-14 07:20:00+00', 4, '2026-02-14 08:10:00+00');
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (3, 'Восточный', 'Ветер с востока. Даёт встречную составляющую около 0,77 скорости ветра. Путевая скорость Boeing-737 NG падает, время полёта растёт.', 'http://localhost:9000/rhumbs/rhumbs-east.jpg', 'http://localhost:9000/rhumbs/rhumbs-east.mp4',
-        'published'::rhumb_status, 90, '88.8',
+        'published'::rhumb_status, 90, '78.5',
         '2026-02-14 07:35:00+00', 5, '2026-02-14 08:25:00+00');
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (4, 'Юго-восточный', 'Ветер с юго-востока, почти строго навстречу путевому углу 130°. Наихудший румб маршрута: встречная составляющая близка к полной скорости ветра, время полёта максимально.', 'http://localhost:9000/rhumbs/rhumbs-south-east.jpg', 'http://localhost:9000/rhumbs/rhumbs-south-east.mp4',
-        'published'::rhumb_status, 135, '133.8',
+        'published'::rhumb_status, 135, '123.5',
         '2026-02-14 07:50:00+00', 5, '2026-02-14 08:40:00+00');
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (5, 'Южный', 'Ветер с юга. Встречная составляющая около 0,64 скорости ветра при заметном сносе влево. Время полёта увеличивается умеренно.', 'http://localhost:9000/rhumbs/rhumbs-south.jpg', 'http://localhost:9000/rhumbs/rhumbs-south.mp4',
-        'published'::rhumb_status, 180, '178.8',
+        'published'::rhumb_status, 180, '168.5',
         '2026-02-14 08:05:00+00', 6, '2026-02-14 08:55:00+00');
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (6, 'Юго-западный', 'Ветер с юго-запада. Угол к путевому около 85°, продольная составляющая почти нулевая, слабо попутная. Румб удалён из каталога.', 'http://localhost:9000/rhumbs/rhumbs-south-west.jpg', 'http://localhost:9000/rhumbs/rhumbs-south-west.mp4',
-        'deleted'::rhumb_status, 225, '223.8',
+        'deleted'::rhumb_status, 225, '213.5',
         '2026-02-14 08:20:00+00', 6, '2026-02-14 09:10:00+00');
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (7, 'Западный', 'Ветер с запада. Попутная составляющая около 0,77 скорости ветра. Путевая скорость растёт, время полёта Лондон–Париж сокращается заметно.', 'http://localhost:9000/rhumbs/rhumbs-west.jpg', 'http://localhost:9000/rhumbs/rhumbs-west.mp4',
-        'published'::rhumb_status, 270, '268.8',
+        'published'::rhumb_status, 270, '258.5',
         '2026-02-14 08:35:00+00', 4, '2026-02-14 09:25:00+00');
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)

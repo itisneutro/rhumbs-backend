@@ -28,10 +28,11 @@
       <div class="rhumbs-tiles__tile">
         <a class="rhumbs-tiles__link" href="/rhumbs/feed/{{this.id}}">
           {{#> rhumbs_image class="rhumbs-tiles__image" imageUrl=this.imageUrl}}<span class="rhumbs-tiles__name">{{this.name}}</span>{{/rhumbs_image}}
+          {{> rhumbs_rose class="rhumbs-rose--tile" geo=this.geographicAzimuthDeg mag=this.magneticAzimuthDeg}}
           <span class="rhumbs-tiles__azimuth"><span class="rhumbs-tiles__azimuth-label">Географический</span> <span class="rhumbs-tiles__azimuth-value">{{this.geographicAzimuthDeg}}°</span></span>
           <span class="rhumbs-tiles__azimuth"><span class="rhumbs-tiles__azimuth-label">Магнитный</span> <span class="rhumbs-tiles__azimuth-value">{{this.magneticAzimuthDeg}}°</span></span>
           <span class="rhumbs-tiles__likes">
-            <svg class="rhumbs-tiles__heart" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/></svg>
+            <svg class="rhumbs-tiles__heart" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/></svg>
             <span class="rhumbs-tiles__likes-count">{{this.likesCount}}</span>
           </span>
         </a>

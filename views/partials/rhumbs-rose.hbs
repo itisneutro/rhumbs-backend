@@ -1,0 +1,16 @@
+{{#if geo includeZero=true}}{{#if mag includeZero=true}}<div class="rhumbs-rose {{class}}" style="--rhumbs-geo: {{geo}}deg; --rhumbs-mag: {{mag}}deg">
+  <svg class="rhumbs-rose__dial" viewBox="0 0 100 100" aria-hidden="true">
+    <circle class="rhumbs-rose__face" cx="50" cy="50" r="46" stroke-width="2"/>
+    <line class="rhumbs-rose__tick" x1="82.53" y1="17.47" x2="78.28" y2="21.72" stroke-width="2"/>
+    <line class="rhumbs-rose__tick" x1="96" y1="50" x2="86" y2="50" stroke-width="3"/>
+    <line class="rhumbs-rose__tick" x1="82.53" y1="82.53" x2="78.28" y2="78.28" stroke-width="2"/>
+    <line class="rhumbs-rose__tick" x1="50" y1="96" x2="50" y2="86" stroke-width="3"/>
+    <line class="rhumbs-rose__tick" x1="17.47" y1="82.53" x2="21.72" y2="78.28" stroke-width="2"/>
+    <line class="rhumbs-rose__tick" x1="4" y1="50" x2="14" y2="50" stroke-width="3"/>
+    <line class="rhumbs-rose__tick" x1="17.47" y1="17.47" x2="21.72" y2="21.72" stroke-width="2"/>
+    <line class="rhumbs-rose__tick rhumbs-rose__tick--north" x1="50" y1="4" x2="50" y2="14" stroke-width="3"/>
+  </svg>
+  <span class="rhumbs-rose__needle rhumbs-rose__needle--mag"></span>
+  <span class="rhumbs-rose__needle rhumbs-rose__needle--geo"></span>
+  <span class="rhumbs-rose__hub"></span>
+</div>{{/if}}{{/if}}

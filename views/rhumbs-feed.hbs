@@ -10,6 +10,8 @@
     {{> rhumbs_video class="rhumbs-feed__video" videoUrl=rhumb.videoUrl autoplay=true}}
 
     <div class="rhumbs-feed__rail">
+      {{> rhumbs_rose class="rhumbs-rose--feed" geo=rhumb.geographicAzimuthDeg mag=rhumb.magneticAzimuthDeg}}
+
       <div class="rhumbs-feed__azimuth">
         <span class="rhumbs-feed__azimuth-value">{{rhumb.geographicAzimuthDeg}}°</span>
         <span class="rhumbs-feed__azimuth-label">Географический</span>
@@ -21,7 +23,7 @@
       </div>
 
       <div class="rhumbs-feed__likes">
-        <svg class="rhumbs-feed__heart" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/></svg>
+        <svg class="rhumbs-feed__heart" viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><path d="M12 21C12 21 3.6 15.6 3.6 9.9 3.6 7.1 5.8 5 8.5 5c1.6 0 3 0.8 3.5 2 0.5-1.2 1.9-2 3.5-2 2.7 0 4.9 2.1 4.9 4.9C20.4 15.6 12 21 12 21z" fill="currentColor"/></svg>
         <span class="rhumbs-feed__likes-count">{{likesCount}}</span>
       </div>
 
