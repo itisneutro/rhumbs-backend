@@ -1,16 +1,27 @@
 {{#if geo includeZero=true}}{{#if mag includeZero=true}}<div class="rhumbs-rose {{class}}" style="--rhumbs-geo: {{geo}}deg; --rhumbs-mag: {{mag}}deg">
-  <svg class="rhumbs-rose__dial" viewBox="0 0 100 100" aria-hidden="true">
-    <circle class="rhumbs-rose__face" cx="50" cy="50" r="46" stroke-width="2"/>
-    <line class="rhumbs-rose__tick" x1="82.53" y1="17.47" x2="78.28" y2="21.72" stroke-width="2"/>
-    <line class="rhumbs-rose__tick" x1="96" y1="50" x2="86" y2="50" stroke-width="3"/>
-    <line class="rhumbs-rose__tick" x1="82.53" y1="82.53" x2="78.28" y2="78.28" stroke-width="2"/>
-    <line class="rhumbs-rose__tick" x1="50" y1="96" x2="50" y2="86" stroke-width="3"/>
-    <line class="rhumbs-rose__tick" x1="17.47" y1="82.53" x2="21.72" y2="78.28" stroke-width="2"/>
-    <line class="rhumbs-rose__tick" x1="4" y1="50" x2="14" y2="50" stroke-width="3"/>
-    <line class="rhumbs-rose__tick" x1="17.47" y1="17.47" x2="21.72" y2="21.72" stroke-width="2"/>
-    <line class="rhumbs-rose__tick rhumbs-rose__tick--north" x1="50" y1="4" x2="50" y2="14" stroke-width="3"/>
+  <svg class="rhumbs-rose__star" viewBox="0 0 100 100" aria-hidden="true">
+    <circle class="rhumbs-rose__ring" cx="50" cy="50" r="47" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="56.36,43.64 54.77,35.23 69.09,30.91" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="56.36,43.64 69.09,30.91 64.77,45.23"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="56.36,56.36 64.77,54.77 69.09,69.09" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="56.36,56.36 69.09,69.09 54.77,64.77"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="43.64,56.36 45.23,64.77 30.91,69.09" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="43.64,56.36 30.91,69.09 35.23,54.77"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="43.64,43.64 35.23,45.23 30.91,30.91" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="43.64,43.64 30.91,30.91 45.23,35.23"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="50,50 43.64,43.64 50,10" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="50,50 50,10 56.36,43.64"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="50,50 56.36,43.64 90,50" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="50,50 90,50 56.36,56.36"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="50,50 56.36,56.36 50,90" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="50,50 50,90 43.64,56.36"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--hollow" points="50,50 43.64,56.36 10,50" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <polygon class="rhumbs-rose__half rhumbs-rose__half--filled" points="50,50 10,50 43.64,43.64"/>
+    <polygon class="rhumbs-rose__ray" points="50,50 43.64,43.64 50,10 56.36,43.64"/>
+    <g class="rhumbs-rose__needle">
+      <line x1="50" y1="50" x2="50" y2="11" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <polygon points="50,5 47.8,11 52.2,11" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    </g>
+    <circle class="rhumbs-rose__hub" cx="50" cy="50" r="3.5"/>
   </svg>
-  <span class="rhumbs-rose__needle rhumbs-rose__needle--mag"></span>
-  <span class="rhumbs-rose__needle rhumbs-rose__needle--geo"></span>
-  <span class="rhumbs-rose__hub"></span>
 </div>{{/if}}{{/if}}
