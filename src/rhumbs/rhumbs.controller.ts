@@ -3,9 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
-  NotFoundException,
   Param,
-  ParseIntPipe,
   Post,
   Query,
   Render,
@@ -23,6 +21,12 @@ function toNumberOrNull(raw: string): number | null {
   const parsed = Number(raw);
 
   return Number.isNaN(parsed) ? null : parsed;
+}
+
+// Нечисловой id в адресе не должен давать ответ с текстом ошибки: такого румба
+// просто нет.
+function toIdOrNull(raw: string): number | null {
+  return /^\d+$/.test(raw) ? Number(raw) : null;
 }
 
 @Controller('rhumbs')
@@ -65,13 +69,20 @@ export class RhumbsController {
   // Публикация дозаполняет название, описание и оба азимута.
   @Post(':id/publish')
   async publishDraft(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') rawId: string,
     @Body('name') name: string,
     @Body('description') description: string,
     @Body('geographicAzimuthDeg') geographic: string,
     @Body('magneticAzimuthDeg') magnetic: string,
     @Res() res: Response,
   ): Promise<void> {
+    const id = toIdOrNull(rawId);
+
+    if (id === null) {
+      res.status(HttpStatus.NOT_FOUND).end();
+      return;
+    }
+
     const geographicDeg = toNumberOrNull(geographic);
     const magneticDeg = toNumberOrNull(magnetic);
 
@@ -89,13 +100,22 @@ export class RhumbsController {
   // Логическое удаление с плитки — сырой SQL в сервисе, здесь только маршрут.
   @Post(':id/delete')
   async markDeleted(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') rawId: string,
     @Res() res: Response,
   ): Promise<void> {
+    const id = toIdOrNull(rawId);
+
+    if (id === null) {
+      res.status(HttpStatus.NOT_FOUND).end();
+      return;
+    }
+
     const deleted = await this.rhumbs.markDeleted(id);
 
+    // пустой RETURNING — только код 404, без тела и без текста ошибки
     if (!deleted) {
-      throw new NotFoundException('Румб не найден');
+      res.status(HttpStatus.NOT_FOUND).end();
+      return;
     }
 
     res.redirect(302, '/rhumbs');
@@ -103,10 +123,17 @@ export class RhumbsController {
 
   @Get('feed/:id')
   async feed(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') rawId: string,
     @Res() res: Response,
     @Query('next') next?: string,
   ): Promise<void> {
+    const id = toIdOrNull(rawId);
+
+    if (id === null) {
+      res.status(HttpStatus.NOT_FOUND).render('rhumbs-missing');
+      return;
+    }
+
     const rhumb =
       next === '1'
         ? await this.rhumbs.findNextPublished(id)

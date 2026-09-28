@@ -70,7 +70,9 @@ body {
 .rhumbs-feed__name,
 .rhumbs-tiles__name,
 .rhumbs-feed__azimuth-value,
+.rhumbs-feed__azimuth-label,
 .rhumbs-tiles__azimuth-value,
+.rhumbs-tiles__azimuth-label,
 .rhumbs-tiles__filter-value,
 .rhumbs-feed__likes-count,
 .rhumbs-tiles__likes-count,
@@ -221,6 +223,14 @@ body {
   fill: transparent;
 }
 
+/* на лёгком стекле белое может попасть на белые облака: свой контур тенью */
+.rhumbs-rose--dark .rhumbs-rose__half,
+.rhumbs-rose--dark .rhumbs-rose__ring,
+.rhumbs-rose--dark .rhumbs-rose__needle,
+.rhumbs-rose--dark .rhumbs-rose__hub {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, .6));
+}
+
 /* в тёмной розе красный луч на стекле близок к нему по яркости: белая обводка
    1px отделяет его не только цветом; non-scaling-stroke держит ровно 1px */
 .rhumbs-rose--dark .rhumbs-rose__ray {
@@ -275,33 +285,38 @@ body {
   fill: currentColor;
 }
 
-/* роза в ленте: 84px на круглой стеклянной подложке 92px (1px обводки + 3px);
-   тон стекла .58, как у панели азимутов, — колонка читается единым целым */
+/* роза в ленте: 80px на своём круглом лёгком стекле 88px (1px обводки + 3px) */
 .rhumbs-rose--feed {
-  width: 92px;
-  height: 92px;
+  width: 88px;
+  height: 88px;
   padding: 3px;
-  border: 1px solid rgba(255, 255, 255, .18);
-  border-radius: 46px;
-  background: rgba(18, 18, 18, .58);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 44px;
+  background: rgba(18, 18, 18, .22);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .rhumbs-rose--feed .rhumbs-rose__star {
-  width: 84px;
-  height: 84px;
+  width: 80px;
+  height: 80px;
 }
 
-/* роза на карточке плитки: светлая, 56px */
+/* роза на карточке плитки: 52px на круглом стекле 58px (1px обводки + 2px) */
 .rhumbs-rose--tile {
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 29px;
+  background: rgba(18, 18, 18, .22);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .rhumbs-rose--tile .rhumbs-rose__star {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
 }
 
 /* ---------- Лента ---------- */
@@ -327,16 +342,41 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  width: 92px;
+  gap: 14px;
+  width: 100px;
+}
+
+/* Мягкое пятно за колонкой вместо полосы во всю высоту: декоративный
+   псевдоэлемент без текста. Эллипс 220×420px с центром в центре колонки: слева
+   коробка выходит на 60px, справа доходит ровно до края экрана (колонка стоит в
+   16px от него), поэтому лента никуда не выезжает — scrollWidth 390px. Центр
+   эллипса задан в пикселях от левого края коробки: 60 + 50. Спад ступенями,
+   чтобы край пятна не читался. */
+.rhumbs-feed__rail::after {
+  content: "";
+  position: absolute;
+  top: -55px;
+  right: -16px;
+  bottom: -55px;
+  left: -60px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 110px 210px at 110px center,
+    rgba(0, 0, 0, .34) 0 34px,
+    rgba(0, 0, 0, .3) 52px,
+    rgba(0, 0, 0, .23) 68px,
+    rgba(0, 0, 0, .15) 84px,
+    rgba(0, 0, 0, .08) 96px,
+    rgba(0, 0, 0, .03) 104px,
+    transparent 110px);
 }
 
 /* градиент на нижние 351px видео высотой 780px, под колонкой и подписью;
-   координаты от колонки: её левый край 282px, нижний 646px */
+   координаты от колонки: её левый край 274px, нижний 646px */
 .rhumbs-feed__rail::before {
   content: "";
   position: absolute;
-  left: -282px;
+  left: -274px;
   bottom: -134px;
   width: 390px;
   height: 351px;
@@ -344,100 +384,84 @@ body {
   background: linear-gradient(transparent, rgba(18, 18, 18, .75));
 }
 
-/* Панель азимутов: два существующих блока складываются в одну стеклянную
-   карточку 92px. У первого верхний отступ 8px, у второго нижний, между строками
-   6px, зазор колонки между блоками снят. */
+/* колонка без контейнера: роза, показания и лайки лежат прямо на видео */
+.rhumbs-feed__gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100px;
+}
+
+/* показание: точка и значение одной центрированной строкой, под ними подпись */
 .rhumbs-feed__azimuth {
   display: flex;
   flex-direction: column;
-  width: 92px;
-  padding: 8px 10px 3px 10px;
-}
-
-.rhumbs-feed__azimuth + .rhumbs-feed__azimuth {
-  position: relative;
-  margin-top: -12px;
-  padding: 3px 10px 8px 10px;
-}
-
-/* стекло одним слоем под обоими блоками (50px + 45px): два полупрозрачных фона
-   дали бы шов на стыке; z-index -1 — над градиентом колонки, под текстом.
-   Тон .58, как у подложки розы: при .38 на самых светлых кадрах видео
-   контраст белых значений падал до 3.65, подписей — до 3.12; при .58 оба
-   не ниже 4.5 */
-.rhumbs-feed__azimuth + .rhumbs-feed__azimuth::after {
-  content: "";
-  position: absolute;
-  top: -50px;
-  left: 0;
-  width: 92px;
-  height: 95px;
-  z-index: -1;
-  border: 1px solid rgba(255, 255, 255, .18);
-  border-radius: 12px;
-  background: rgba(18, 18, 18, .58);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  align-items: center;
+  width: 100px;
 }
 
 .rhumbs-feed__azimuth-value {
-  font-size: 20px;
-  line-height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 22px;
+  line-height: 24px;
   font-weight: 700;
   color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
 }
 
-/* полоска под географическим значением — легенда к красному лучу розы */
-.rhumbs-feed__azimuth-value::after {
+/* точка-легенда: цвет как у стрелок розы */
+.rhumbs-feed__azimuth-value::before {
   content: "";
-  display: block;
-  width: 16px;
-  height: 3px;
-  margin-top: 2px;
-  border-radius: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
   background: var(--rhumbs-accent);
 }
 
-.rhumbs-feed__azimuth + .rhumbs-feed__azimuth .rhumbs-feed__azimuth-value::after {
-  content: none;
+.rhumbs-feed__azimuth + .rhumbs-feed__azimuth .rhumbs-feed__azimuth-value::before {
+  background: #FFFFFF;
+  box-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
 }
 
+/* подпись 11px и ореол плотнее: при 10px контраст на светлых кадрах давал 4.30 */
 .rhumbs-feed__azimuth-label {
-  font-size: 10px;
-  line-height: 12px;
-  color: rgba(255, 255, 255, .8);
-}
-
-.rhumbs-feed__likes {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 400;
+  white-space: nowrap;
   color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
 }
 
+/* лайки: сердце, под ним число */
+.rhumbs-feed__likes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* сердце Lucide: сплошная заливка, без обводки */
 .rhumbs-feed__heart {
   display: block;
-  width: 34px;
-  height: 34px;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .45));
+  width: 30px;
+  height: 30px;
+}
+
+.rhumbs-feed__heart path {
+  fill: #FFFFFF;
+  stroke: none;
 }
 
 .rhumbs-feed__likes-count {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  font-size: 12px;
-  line-height: 14px;
+  font-size: 15px;
+  line-height: 17px;
   font-weight: 700;
-  color: var(--rhumbs-accent);
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
 }
 
 .rhumbs-feed__next {
@@ -458,14 +482,14 @@ body {
   height: 24px;
 }
 
-/* подпись снизу слева, 16px над панелью вкладок; ширина 262px: правый край
-   278px, колонка начинается с 282px, поэтому текст под неё не заходит */
+/* подпись снизу слева, 16px над панелью вкладок; ширина 254px: правый край
+   270px, колонка начинается с 274px, поэтому текст под неё не заходит */
 .rhumbs-feed__info {
   position: absolute;
   left: 16px;
   bottom: 80px;
   z-index: 1;
-  width: 262px;
+  width: 254px;
   color: #FFFFFF;
 }
 
@@ -502,12 +526,12 @@ body {
   top: -48px;
   bottom: -16px;
   left: -16px;
-  width: 282px;
+  width: 274px;
   z-index: -1;
   pointer-events: none;
   background: linear-gradient(transparent, rgba(18, 18, 18, .5) 48px);
-  -webkit-mask-image: linear-gradient(to right, #000000 262px, transparent 282px);
-  mask-image: linear-gradient(to right, #000000 262px, transparent 282px);
+  -webkit-mask-image: linear-gradient(to right, #000000 254px, transparent 274px);
+  mask-image: linear-gradient(to right, #000000 254px, transparent 274px);
 }
 
 .rhumbs-feed__description {
@@ -657,11 +681,10 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
   box-shadow: 0 2px 4px rgba(18, 18, 18, .05), 0 8px 20px rgba(18, 18, 18, .08);
 }
 
-/* Сетка ссылки: изображение на всю ширину, под ним слева роза (10px отступа +
-   56px + 8px зазора), справа две строки азимутов (89px + 10px отступа) */
+/* Сетка ссылки: изображение на всю ширину, под ним две равные колонки показаний */
 .rhumbs-tiles__link {
   display: grid;
-  grid-template-columns: 74px 99px;
+  grid-template-columns: 1fr 1fr;
   color: var(--rhumbs-text);
   text-decoration: none;
 }
@@ -699,78 +722,72 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
   color: #FFFFFF;
 }
 
-.rhumbs-tiles__link > .rhumbs-rose {
-  grid-column: 1;
-  grid-row: 2 / 4;
-  align-self: center;
-  margin: 10px 0 0 10px;
+/* роза в правом верхнем углу изображения */
+.rhumbs-tiles__image > .rhumbs-rose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
-/* строка азимута: значение над подписью, в разметке подпись идёт первой */
+/* Показание: значение и под ним подпись, по левому краю колонки.
+   В разметке подпись идёт раньше значения, поэтому колонка развёрнута. */
 .rhumbs-tiles__azimuth {
-  grid-column: 2;
   display: flex;
   flex-direction: column-reverse;
-  margin: 0 10px 0 0;
-}
-
-.rhumbs-tiles__azimuth:first-of-type {
-  margin-top: 10px;
+  padding: 10px 0 8px 10px;
 }
 
 .rhumbs-tiles__azimuth + .rhumbs-tiles__azimuth {
-  margin-top: 4px;
+  padding: 10px 10px 8px 0;
+}
+
+.rhumbs-tiles__azimuth-value {
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--rhumbs-text);
 }
 
 .rhumbs-tiles__azimuth-label {
   font-size: 10px;
-  line-height: 12px;
+  line-height: 13px;
+  white-space: nowrap;
   color: var(--rhumbs-muted);
 }
 
-/* цвет значения — легенда к стрелкам розы: красное — географический */
-.rhumbs-tiles__azimuth-value {
-  font-size: 20px;
-  line-height: 24px;
-  font-weight: 700;
-  color: var(--rhumbs-accent);
-}
-
-.rhumbs-tiles__azimuth + .rhumbs-tiles__azimuth .rhumbs-tiles__azimuth-value {
-  color: var(--rhumbs-text);
-}
-
-/* сердце в нижней строке слева, по центру высоты кнопки «Удалить»:
-   10px отступа + 17px половины кнопки − 13px половины сердца = 14px */
+/* капсула лайков в левом верхнем углу изображения, по центру высоты розы:
+   центр розы 8 + 29 = 37px, половина капсулы 14px */
 .rhumbs-tiles__likes {
   position: absolute;
-  left: 10px;
-  bottom: 14px;
+  top: 23px;
+  left: 8px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  color: var(--rhumbs-accent);
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 14px;
+  background: rgba(18, 18, 18, .22);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
+/* сердце Lucide: сплошная белая заливка, без обводки */
 .rhumbs-tiles__heart {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 14px;
+  height: 14px;
+}
+
+.rhumbs-tiles__heart path {
+  fill: #FFFFFF;
+  stroke: none;
 }
 
 .rhumbs-tiles__likes-count {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  font-size: 11px;
-  line-height: 13px;
+  font-size: 14px;
+  line-height: 16px;
   font-weight: 700;
   color: #FFFFFF;
 }
@@ -778,12 +795,12 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
 .rhumbs-tiles__remove {
   display: flex;
   margin: 0;
-  padding: 10px;
+  padding: 0 10px 10px 10px;
 }
 
-/* «Удалить» по содержимому, у правого края нижней строки */
+/* «Удалить» на всю ширину тела карточки */
 .rhumbs-tiles__remove-button {
-  margin-left: auto;
+  flex: 1;
 }
 
 /* ---------- Добавление ---------- */
@@ -893,7 +910,7 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
 
 /* ---------- Румб не найден ---------- */
 
-/* заголовок и строка — в одной белой панели */
+/* заголовок в белой панели */
 .rhumbs-missing {
   flex-shrink: 0;
   margin: 24px 0 0 0;
@@ -903,13 +920,7 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
   box-shadow: 0 8px 24px rgba(18, 18, 18, .12);
 }
 
+/* под заголовком больше ничего нет, поэтому нижнего отступа тоже нет */
 .rhumbs-missing .rhumbs-missing__title {
-  margin: 0 0 8px 0;
-}
-
-.rhumbs-missing__note {
   margin: 0;
-  font-size: 15px;
-  line-height: 22px;
-  color: var(--rhumbs-text);
 }
