@@ -346,31 +346,6 @@ body {
   width: 100px;
 }
 
-/* Мягкое пятно за колонкой вместо полосы во всю высоту: декоративный
-   псевдоэлемент без текста. Эллипс 220×420px с центром в центре колонки: слева
-   коробка выходит на 60px, справа доходит ровно до края экрана (колонка стоит в
-   16px от него), поэтому лента никуда не выезжает — scrollWidth 390px. Центр
-   эллипса задан в пикселях от левого края коробки: 60 + 50. Спад ступенями,
-   чтобы край пятна не читался. */
-.rhumbs-feed__rail::after {
-  content: "";
-  position: absolute;
-  top: -55px;
-  right: -16px;
-  bottom: -55px;
-  left: -60px;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(ellipse 110px 210px at 110px center,
-    rgba(0, 0, 0, .34) 0 34px,
-    rgba(0, 0, 0, .3) 52px,
-    rgba(0, 0, 0, .23) 68px,
-    rgba(0, 0, 0, .15) 84px,
-    rgba(0, 0, 0, .08) 96px,
-    rgba(0, 0, 0, .03) 104px,
-    transparent 110px);
-}
-
 /* градиент на нижние 351px видео высотой 780px, под колонкой и подписью;
    координаты от колонки: её левый край 274px, нижний 646px */
 .rhumbs-feed__rail::before {
@@ -401,6 +376,8 @@ body {
   width: 100px;
 }
 
+/* Вместо пятна за колонкой — плотный многослойный ореол: четыре тени от
+   1px до 14px затемняют фон только вплотную к буквам, дальше видео чистое. */
 .rhumbs-feed__azimuth-value {
   display: flex;
   align-items: center;
@@ -409,21 +386,27 @@ body {
   line-height: 24px;
   font-weight: 700;
   color: #FFFFFF;
-  text-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
+  text-shadow: 0 0 1px rgba(0, 0, 0, .7),
+    0 0 3px rgba(0, 0, 0, .55),
+    0 0 8px rgba(0, 0, 0, .4),
+    0 1px 14px rgba(0, 0, 0, .3);
 }
 
-/* точка-легенда: цвет как у стрелок розы */
+/* точка-легенда: цвет как у стрелок розы, ореол тот же, что у букв */
 .rhumbs-feed__azimuth-value::before {
   content: "";
   width: 6px;
   height: 6px;
   border-radius: 3px;
   background: var(--rhumbs-accent);
+  box-shadow: 0 0 1px rgba(0, 0, 0, .7),
+    0 0 3px rgba(0, 0, 0, .55),
+    0 0 8px rgba(0, 0, 0, .4),
+    0 1px 14px rgba(0, 0, 0, .3);
 }
 
 .rhumbs-feed__azimuth + .rhumbs-feed__azimuth .rhumbs-feed__azimuth-value::before {
   background: #FFFFFF;
-  box-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
 }
 
 /* подпись 11px и ореол плотнее: при 10px контраст на светлых кадрах давал 4.30 */
@@ -433,22 +416,29 @@ body {
   font-weight: 400;
   white-space: nowrap;
   color: #FFFFFF;
-  text-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
+  text-shadow: 0 0 1px rgba(0, 0, 0, .7),
+    0 0 3px rgba(0, 0, 0, .55),
+    0 0 8px rgba(0, 0, 0, .4),
+    0 1px 14px rgba(0, 0, 0, .3);
 }
 
 /* лайки: сердце, под ним число */
+/* лайки — строка без подложки: сердце и число держит только ореол */
 .rhumbs-feed__likes {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 6px;
 }
 
-/* сердце Lucide: сплошная заливка, без обводки */
+/* сердце Lucide: сплошная заливка, без обводки; ореол тот же, что у букв */
 .rhumbs-feed__heart {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, .7))
+    drop-shadow(0 0 3px rgba(0, 0, 0, .55))
+    drop-shadow(0 0 8px rgba(0, 0, 0, .4))
+    drop-shadow(0 1px 14px rgba(0, 0, 0, .3));
 }
 
 .rhumbs-feed__heart path {
@@ -457,11 +447,14 @@ body {
 }
 
 .rhumbs-feed__likes-count {
-  font-size: 15px;
-  line-height: 17px;
+  font-size: 20px;
+  line-height: 22px;
   font-weight: 700;
   color: #FFFFFF;
-  text-shadow: 0 0 8px rgba(0, 0, 0, .75), 0 1px 2px rgba(0, 0, 0, .8);
+  text-shadow: 0 0 1px rgba(0, 0, 0, .7),
+    0 0 3px rgba(0, 0, 0, .55),
+    0 0 8px rgba(0, 0, 0, .4),
+    0 1px 14px rgba(0, 0, 0, .3);
 }
 
 .rhumbs-feed__next {
@@ -729,12 +722,21 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
   right: 8px;
 }
 
-/* Показание: значение и под ним подпись, по левому краю колонки.
-   В разметке подпись идёт раньше значения, поэтому колонка развёрнута. */
+/* Показание: значение и под ним подпись, по центру своей колонки.
+   В разметке подпись идёт раньше значения, поэтому колонка развёрнута.
+   Боковые отступы 10px стоят только с внешних сторон, поэтому пара колонок
+   занимает ровно ширину кнопки «Удалить» (173 − 10 − 10 = 153px) и совпадает
+   с ней по краям. */
 .rhumbs-tiles__azimuth {
   display: flex;
   flex-direction: column-reverse;
   padding: 10px 0 8px 10px;
+  text-align: center;
+}
+
+.rhumbs-tiles__azimuth + .rhumbs-tiles__azimuth {
+  padding-left: 0;
+  padding-right: 10px;
 }
 
 .rhumbs-tiles__azimuth + .rhumbs-tiles__azimuth {
@@ -755,29 +757,27 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
   color: var(--rhumbs-muted);
 }
 
-/* капсула лайков в левом верхнем углу изображения, по центру высоты розы:
-   центр розы 8 + 29 = 37px, половина капсулы 14px */
+/* лайки строкой, как в ленте: в левом верхнем углу изображения, по центру
+   высоты розы — центр розы 8 + 29 = 37px, половина строки 10px, значит верх
+   на 27px */
 .rhumbs-tiles__likes {
   position: absolute;
-  top: 23px;
+  top: 27px;
   left: 8px;
   display: flex;
   align-items: center;
   gap: 5px;
-  height: 28px;
-  padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, .35);
-  border-radius: 14px;
-  background: rgba(18, 18, 18, .22);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
 }
 
-/* сердце Lucide: сплошная белая заливка, без обводки */
+/* сердце Lucide: сплошная белая заливка, без обводки; ореол тот же, что в ленте */
 .rhumbs-tiles__heart {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, .7))
+    drop-shadow(0 0 3px rgba(0, 0, 0, .55))
+    drop-shadow(0 0 8px rgba(0, 0, 0, .4))
+    drop-shadow(0 1px 14px rgba(0, 0, 0, .3));
 }
 
 .rhumbs-tiles__heart path {
@@ -786,10 +786,14 @@ input[type="range"].rhumbs-tiles__filter-range::-moz-range-thumb {
 }
 
 .rhumbs-tiles__likes-count {
-  font-size: 14px;
-  line-height: 16px;
+  font-size: 17px;
+  line-height: 19px;
   font-weight: 700;
   color: #FFFFFF;
+  text-shadow: 0 0 1px rgba(0, 0, 0, .7),
+    0 0 3px rgba(0, 0, 0, .55),
+    0 0 8px rgba(0, 0, 0, .4),
+    0 1px 14px rgba(0, 0, 0, .3);
 }
 
 .rhumbs-tiles__remove {
