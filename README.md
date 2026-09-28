@@ -39,8 +39,7 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 | Метод | Адрес | Тело запроса | Тело ответа | Коды |
 |---|---|---|---|---|
 | GET | `/rhumbs?minAzimuth=` | — | массив румбов | 200, 400 |
-| GET | `/rhumbs/feed` | — | румб | 200, 404 |
-| GET | `/rhumbs/feed/:id?next=true` | — | румб | 200, 400, 404 |
+| GET | `/rhumbs/feed[/:id]?next=true` | — | румб | 200, 400, 404 |
 | GET | `/rhumbs/draft` | — | румб | 200, 404 |
 | POST | `/rhumbs` | `multipart/form-data`: `name`, `image`, `video` | румб | 201, 400 |
 | PUT | `/rhumbs/:id/publish` | JSON: `name`, `description`, `geographicAzimuthDeg`, `magneticAzimuthDeg` | румб | 200, 400, 404 |

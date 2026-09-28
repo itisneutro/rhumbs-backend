@@ -59,22 +59,17 @@ export class RhumbsController {
     return this.rhumbs.findPublished(query.minAzimuth);
   }
 
-  @Get('feed')
-  async feedStart(): Promise<RhumbResponseDto> {
-    return this.rhumbs.findFeedStart();
+  @Get(['feed', 'feed/:id'])
+  async feed(
+    @Param('id', new ParseIntPipe({ optional: true })) id: number | undefined,
+    @Query() query: FeedQueryDto,
+  ): Promise<RhumbResponseDto> {
+    return this.rhumbs.findFeed(id, query.next);
   }
 
   @Get('draft')
   async draft(): Promise<RhumbResponseDto> {
     return this.rhumbs.findDraft();
-  }
-
-  @Get('feed/:id')
-  async feedItem(
-    @Param('id', ParseIntPipe) id: number,
-    @Query() query: FeedQueryDto,
-  ): Promise<RhumbResponseDto> {
-    return this.rhumbs.findFeedItem(id, query.next);
   }
 
   @Post()

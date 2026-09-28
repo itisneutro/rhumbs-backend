@@ -27,13 +27,11 @@ export class RhumbsService {
     return rows.map(({ rhumb, likesCount }) => this.toResponse(rhumb, likesCount));
   }
 
-  async findFeedStart(): Promise<RhumbResponseDto> {
-    const rhumb = await this.rhumbs.findFirstPublished();
+  async findFeed(id?: number, next?: boolean): Promise<RhumbResponseDto> {
+    if (id === undefined) {
+      return this.withLikes(await this.rhumbs.findFirstPublished());
+    }
 
-    return this.withLikes(rhumb);
-  }
-
-  async findFeedItem(id: number, next?: boolean): Promise<RhumbResponseDto> {
     const rhumb = next
       ? await this.rhumbs.findNextPublished(id)
       : await this.rhumbs.findPublishedById(id);

@@ -32,16 +32,30 @@ describe('RhumbsController (e2e)', () => {
       .expect(200);
   });
 
-  it('/api/rhumbs/feed (GET)', () => {
-    return request(app.getHttpServer() as App)
+  it('/api/rhumbs/feed (GET): один метод на оба адреса', async () => {
+    const start = await request(app.getHttpServer() as App)
       .get('/api/rhumbs/feed')
       .expect(200);
-  });
 
-  it('/api/rhumbs/feed/999 (GET)', () => {
-    return request(app.getHttpServer() as App)
+    const byId = await request(app.getHttpServer() as App)
+      .get('/api/rhumbs/feed/2')
+      .expect(200);
+
+    const next = await request(app.getHttpServer() as App)
+      .get('/api/rhumbs/feed/2?next=true')
+      .expect(200);
+
+    expect((start.body as { id: number }).id).toBe(1);
+    expect((byId.body as { id: number }).id).toBe(2);
+    expect((next.body as { id: number }).id).toBe(3);
+
+    await request(app.getHttpServer() as App)
       .get('/api/rhumbs/feed/999')
-      .expect(404);
+      .expect(404, '');
+
+    await request(app.getHttpServer() as App)
+      .get('/api/rhumbs/feed/abc')
+      .expect(400, '');
   });
 
   it('/api/rhumbs (GET): признак создателя 0 или 1', async () => {
