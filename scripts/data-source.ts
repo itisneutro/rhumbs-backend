@@ -8,7 +8,6 @@ import { User } from '../src/rhumbs/entities/user.entity';
 
 config();
 
-// Один источник данных для команды миграции и для генератора TypeORM.
 const dataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST,

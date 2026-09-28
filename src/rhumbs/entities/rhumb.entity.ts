@@ -20,7 +20,6 @@ export class Rhumb {
   @Column({ name: 'description', type: 'varchar', length: 512, nullable: true })
   description: string | null;
 
-  // адреса обязательны: пустая строка означает «показать заглушку с SSR-сервера»
   @Column({
     name: 'image_url',
     type: 'varchar',
@@ -47,11 +46,9 @@ export class Rhumb {
   })
   status: RhumbStatus;
 
-  // географический азимут — целые градусы 0..315
   @Column({ name: 'geographic_azimuth_deg', type: 'smallint', nullable: true })
   geographicAzimuthDeg: number | null;
 
-  // магнитный азимут — градусы с десятой долей, склонение Москвы 11.5°
   @Column({
     name: 'magnetic_azimuth_deg',
     type: 'numeric',
@@ -71,7 +68,6 @@ export class Rhumb {
   @JoinColumn({ name: 'creator_id' })
   creator: User;
 
-  // дата формирования — проставляется при публикации, у черновика пуста
   @Column({ name: 'formed_at', type: 'timestamptz', nullable: true })
   formedAt: Date | null;
 }

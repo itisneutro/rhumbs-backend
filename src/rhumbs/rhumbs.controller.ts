@@ -12,7 +12,6 @@ import {
 import type { Response } from 'express';
 import { CURRENT_USER_ID, RhumbsService } from './rhumbs.service';
 
-// Пустое поле формы и нечисловой ввод дают null, а не 0: Number('') === 0.
 function toNumberOrNull(raw: string): number | null {
   if (raw === undefined || raw.trim() === '') {
     return null;
@@ -23,8 +22,6 @@ function toNumberOrNull(raw: string): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-// Нечисловой id в адресе не должен давать ответ с текстом ошибки: такого румба
-// просто нет.
 function toIdOrNull(raw: string): number | null {
   return /^\d+$/.test(raw) ? Number(raw) : null;
 }
@@ -55,7 +52,6 @@ export class RhumbsController {
     return { rhumb };
   }
 
-  // Черновик создаётся только по названию — кнопкой «Далее».
   @Post('draft')
   async createDraft(
     @Body('name') name: string,
@@ -66,7 +62,6 @@ export class RhumbsController {
     res.redirect(302, '/rhumbs/draft');
   }
 
-  // Публикация дозаполняет название, описание и оба азимута.
   @Post(':id/publish')
   async publishDraft(
     @Param('id') rawId: string,
@@ -97,7 +92,6 @@ export class RhumbsController {
     res.redirect(302, '/rhumbs');
   }
 
-  // Логическое удаление с плитки — сырой SQL в сервисе, здесь только маршрут.
   @Post(':id/delete')
   async markDeleted(
     @Param('id') rawId: string,
@@ -112,7 +106,6 @@ export class RhumbsController {
 
     const deleted = await this.rhumbs.markDeleted(id);
 
-    // пустой RETURNING — только код 404, без тела и без текста ошибки
     if (!deleted) {
       res.status(HttpStatus.NOT_FOUND).end();
       return;

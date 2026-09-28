@@ -1,19 +1,9 @@
--- Сид: текущее демонстрационное состояние базы.
--- Запускается после npm run migrate, идентификаторы заданы явно.
-
 BEGIN;
 
--- 3 пользователя
 INSERT INTO users (id, login, password) VALUES (4, 'n.vasilev', 'rhumbs2026');
 INSERT INTO users (id, login, password) VALUES (5, 'a.sokolova', 'rhumbs2026');
 INSERT INTO users (id, login, password) VALUES (6, 'p.erokhin', 'rhumbs2026');
 
--- 8 румбов: 6 published, id 6 deleted, id 8 draft с пустыми url.
--- Черновик принадлежит пользователю 5, чтобы у текущего пользователя
--- (CURRENT_USER_ID = 4) черновика не было и страница добавления
--- открывалась в состоянии с кнопкой «Далее».
--- Магнитное склонение Москвы 11,5° восточное:
--- магнитный азимут = (географический − 11,5) по модулю 360.
 INSERT INTO rhumbs (id, name, description, image_url, video_url, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
 VALUES (1, 'Северный', 'Ветер с севера. На путевом угле 130° даёт попутную составляющую около 0,64 скорости ветра и умеренный снос вправо. Время полёта Лондон–Париж сокращается.', 'http://localhost:9000/rhumbs/rhumbs-north.jpg', 'http://localhost:9000/rhumbs/rhumbs-north.mp4',
@@ -55,7 +45,6 @@ VALUES (8, 'Северо-западный', NULL, '', '',
         'draft'::rhumb_status, NULL, NULL,
         '2026-02-14 08:50:00+00', 5, NULL);
 
--- 9 лайков
 INSERT INTO rhumbs_likes (id, user_id, rhumb_id) VALUES (1, 4, 1);
 INSERT INTO rhumbs_likes (id, user_id, rhumb_id) VALUES (2, 4, 4);
 INSERT INTO rhumbs_likes (id, user_id, rhumb_id) VALUES (3, 4, 7);
@@ -66,7 +55,6 @@ INSERT INTO rhumbs_likes (id, user_id, rhumb_id) VALUES (7, 6, 1);
 INSERT INTO rhumbs_likes (id, user_id, rhumb_id) VALUES (8, 6, 3);
 INSERT INTO rhumbs_likes (id, user_id, rhumb_id) VALUES (9, 6, 4);
 
--- последовательности сбрасываются после вставки явных идентификаторов
 SELECT setval('users_id_seq', 6, true);
 SELECT setval('rhumbs_id_seq', 8, true);
 SELECT setval('rhumbs_likes_id_seq', 9, true);
