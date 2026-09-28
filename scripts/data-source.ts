@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import { join } from 'node:path';
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
-import { RhumbLike } from '../src/rhumbs/entities/rhumb-like.entity';
-import { Rhumb } from '../src/rhumbs/entities/rhumb.entity';
-import { User } from '../src/rhumbs/entities/user.entity';
+import { RhumbLike } from '../src/entities/rhumb-like.entity';
+import { Rhumb } from '../src/entities/rhumb.entity';
+import { User } from '../src/entities/user.entity';
 
 config();
 

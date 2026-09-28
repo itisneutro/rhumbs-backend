@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "Румбы ветра — ЛР-3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "rhumbId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Список с фильтром",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs?minAzimuth=90",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs"],
+          "query": [{ "key": "minAzimuth", "value": "90" }]
+        }
+      }
+    },
+    {
+      "name": "2. Добавление с картинкой и видео",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('rhumbId', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "Тестовый румб", "type": "text" },
+            { "key": "image", "src": "postman/files/rhumbs-demo.jpg", "type": "file" },
+            { "key": "video", "src": "postman/files/rhumbs-demo.mp4", "type": "file" }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs"]
+        }
+      }
+    },
+    {
+      "name": "3. Поля черновика",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/draft",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "draft"]
+        }
+      }
+    },
+    {
+      "name": "4. Публикация",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "options": { "raw": { "language": "json" } },
+          "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geographicAzimuthDeg\": 45,\n  \"magneticAzimuthDeg\": 33.5\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/{{rhumbId}}/publish",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "{{rhumbId}}", "publish"]
+        }
+      }
+    },
+    {
+      "name": "5. Лента без id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/feed",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "feed"]
+        }
+      }
+    },
+    {
+      "name": "6. Лента по id, следующий",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/feed/{{rhumbId}}?next=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "feed", "{{rhumbId}}"],
+          "query": [{ "key": "next", "value": "true" }]
+        }
+      }
+    },
+    {
+      "name": "7. Лайк",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "options": { "raw": { "language": "json" } },
+          "raw": "{\n  \"value\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/{{rhumbId}}/like",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "{{rhumbId}}", "like"]
+        }
+      }
+    },
+    {
+      "name": "8. Удаление",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/{{rhumbId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "{{rhumbId}}"]
+        }
+      }
+    },
+    {
+      "name": "9. Регистрация",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "options": { "raw": { "language": "json" } },
+          "raw": "{\n  \"login\": \"i.petrov\",\n  \"password\": \"rhumbs2026\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["users"]
+        }
+      }
+    },
+    {
+      "name": "10. Вход (заглушка)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "login"]
+        }
+      }
+    }
+  ]
+}

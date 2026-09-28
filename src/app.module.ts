@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { RhumbsModule } from './rhumbs/rhumbs.module';
+import { RhumbsModule } from './modules/rhumbs/rhumbs.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RhumbsModule } from './rhumbs/rhumbs.module';
       }),
     }),
     RhumbsModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

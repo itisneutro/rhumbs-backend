@@ -21,22 +21,22 @@ export class Rhumb {
   description: string | null;
 
   @Column({
-    name: 'image_url',
+    name: 'image_key',
     type: 'varchar',
     length: 256,
     nullable: false,
     default: '',
   })
-  imageUrl: string;
+  imageKey: string;
 
   @Column({
-    name: 'video_url',
+    name: 'video_key',
     type: 'varchar',
     length: 256,
     nullable: false,
     default: '',
   })
-  videoUrl: string;
+  videoKey: string;
 
   @Column({
     name: 'status',

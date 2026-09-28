@@ -2,6 +2,12 @@ BEGIN;
 
 DELETE FROM rhumbs_likes WHERE rhumb_id > 8;
 DELETE FROM rhumbs WHERE id > 8;
+DELETE FROM rhumbs_likes WHERE user_id > 6;
+DELETE FROM users WHERE id > 6;
+
+UPDATE users SET password = '$2b$10$9t./3.aXgm9dpFliELxlq.GuP4FTJ/zaYizl4CgbN6H/Nxnbq4wTm' WHERE id = 4;
+UPDATE users SET password = '$2b$10$lXElNIDfMEmfOn0sBMFv6OecSohSVexfRjtGClFdfBbNogyGnRry.' WHERE id = 5;
+UPDATE users SET password = '$2b$10$/qmAexUtFRsGAv6D2YLoUeJsjrivWsYZs0iR8jxmzYjPZmnYFNfDy' WHERE id = 6;
 
 UPDATE rhumbs SET status = 'published'::rhumb_status WHERE id IN (1, 2, 3, 4, 5, 7);
 UPDATE rhumbs SET status = 'deleted'::rhumb_status   WHERE id = 6;
@@ -20,10 +26,11 @@ UPDATE rhumbs
        geographic_azimuth_deg = NULL,
        magnetic_azimuth_deg = NULL,
        formed_at = NULL,
-       image_url = '',
-       video_url = ''
+       image_key = '',
+       video_key = ''
  WHERE id = 8;
 
+SELECT setval('users_id_seq', 6, true);
 SELECT setval('rhumbs_id_seq', 8, true);
 SELECT setval('rhumbs_likes_id_seq', 9, true);
 

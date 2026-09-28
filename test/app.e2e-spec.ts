@@ -1,42 +1,84 @@
-import { join } from 'node:path';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import hbs from 'hbs';
 import request from 'supertest';
 import { App } from 'supertest/types';
+import { HttpExceptionFilter } from './../src/common/http-exception.filter';
 import { AppModule } from './../src/app.module';
 
 describe('RhumbsController (e2e)', () => {
-  let app: NestExpressApplication;
+  let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication<NestExpressApplication>();
-    app.setBaseViewsDir(join(__dirname, '..', 'views'));
-    app.setViewEngine('hbs');
-    hbs.registerPartials(join(__dirname, '..', 'views', 'partials'));
+    app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    app.useGlobalFilters(new HttpExceptionFilter());
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
     await app.init();
   });
 
-  it('/rhumbs (GET)', () => {
+  it('/api/rhumbs (GET)', () => {
     return request(app.getHttpServer() as App)
-      .get('/rhumbs')
+      .get('/api/rhumbs')
       .expect(200);
   });
 
-  it('/rhumbs/draft (GET)', () => {
+  it('/api/rhumbs/feed (GET)', () => {
     return request(app.getHttpServer() as App)
-      .get('/rhumbs/draft')
+      .get('/api/rhumbs/feed')
       .expect(200);
   });
 
-  it('/rhumbs/feed/1 (GET)', () => {
+  it('/api/rhumbs/feed/999 (GET)', () => {
     return request(app.getHttpServer() as App)
-      .get('/rhumbs/feed/1')
+      .get('/api/rhumbs/feed/999')
+      .expect(404);
+  });
+
+  it('/api/rhumbs (GET): признак создателя 0 или 1', async () => {
+    const response = await request(app.getHttpServer() as App)
+      .get('/api/rhumbs')
       .expect(200);
+
+    const rhumbs = response.body as { id: number; isCreator: number }[];
+
+    expect(rhumbs.length).toBeGreaterThan(0);
+
+    for (const rhumb of rhumbs) {
+      expect([0, 1]).toContain(rhumb.isCreator);
+    }
+
+    const own = rhumbs.find((rhumb) => rhumb.id === 1);
+
+    expect(own?.isCreator).toBe(1);
+  });
+
+  it('/api/users (POST): регистрация и занятый логин', async () => {
+    const login = `e2e.petrov.${process.pid}`;
+
+    const created = await request(app.getHttpServer() as App)
+      .post('/api/users')
+      .send({ login, password: 'rhumbs2026' })
+      .expect(201);
+
+    expect(created.body).toEqual({
+      id: expect.any(Number) as number,
+      login,
+    });
+
+    await request(app.getHttpServer() as App)
+      .post('/api/users')
+      .send({ login, password: 'rhumbs2026' })
+      .expect(400, '');
   });
 
   afterEach(async () => {
