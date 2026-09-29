@@ -1,4 +1,4 @@
-# Румбы ветра — JSON API (ЛР-3)
+# Румбы — JSON API (ЛР-3)
 
 Время полёта Boeing-737 NG Лондон–Париж в зависимости от направления ветра.
 Услуги — 8 румбов ветра. Приложение на NestJS отдаёт только JSON, шаблонов нет.
@@ -42,7 +42,7 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 | GET | `/rhumbs/feed[/:id]?next=true` | — | румб | 200, 400, 404 |
 | GET | `/rhumbs/draft` | — | румб | 200, 404 |
 | POST | `/rhumbs` | `multipart/form-data`: `name`, `image`, `video` | румб | 201, 400 |
-| PUT | `/rhumbs/draft/publish` | JSON: `name`, `description`, `geographicAzimuthDeg`, `magneticAzimuthDeg` | румб | 200, 404 |
+| PUT | `/rhumbs/draft/publish` | JSON: `name`, `description`, `geographicAzimuthDeg`, `magneticAzimuthDeg` | румб | 200, 400, 404 |
 | DELETE | `/rhumbs/:id` | — | пусто | 200, 400, 404 |
 | POST | `/rhumbs/:id/like` | JSON: `value` (0 или 1) | румб | 200, 400, 404 |
 | POST | `/users` | JSON: `login`, `password` | `{ id, login }` | 201, 400 |
