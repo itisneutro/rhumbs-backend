@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../../entities/user.entity';
+import { Users } from '../../../entities/users.entity';
 
 @Injectable()
 export class TypeORMUsersRepository {
   constructor(
-    @InjectRepository(User)
-    private readonly users: Repository<User>,
+    @InjectRepository(Users)
+    private readonly usersRepository: Repository<Users>,
   ) {}
 
   async existsByLogin(login: string): Promise<boolean> {
-    return this.users.exists({ where: { login } });
+    return this.usersRepository.exists({ where: { login } });
   }
 
-  async create(login: string, password: string): Promise<User> {
-    return this.users.save(this.users.create({ login, password }));
+  async create(login: string, password: string): Promise<Users> {
+    return this.usersRepository.save(this.usersRepository.create({ login, password }));
   }
 }

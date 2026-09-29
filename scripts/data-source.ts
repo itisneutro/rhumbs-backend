@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import { join } from 'node:path';
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
-import { RhumbLike } from '../src/entities/rhumb-like.entity';
-import { Rhumb } from '../src/entities/rhumb.entity';
-import { User } from '../src/entities/user.entity';
+import { RhumbsLikes } from '../src/entities/rhumbs-likes.entity';
+import { Rhumbs } from '../src/entities/rhumbs.entity';
+import { Users } from '../src/entities/users.entity';
 
 config();
 
@@ -15,7 +15,7 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [Rhumb, User, RhumbLike],
+  entities: [Rhumbs, Users, RhumbsLikes],
   migrations: [join(__dirname, '..', 'src', 'migrations', '*.ts')],
   migrationsTableName: 'rhumbs_migrations',
   synchronize: false,

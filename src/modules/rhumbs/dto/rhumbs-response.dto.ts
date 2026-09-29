@@ -3,7 +3,7 @@ import { Expose, Transform } from 'class-transformer';
 const toNumberOrNull = ({ value }: { value: unknown }): number | null =>
   value === null || value === undefined ? null : Number(value);
 
-export class RhumbResponseDto {
+export class RhumbsResponseDto {
   @Expose()
   id: number;
 

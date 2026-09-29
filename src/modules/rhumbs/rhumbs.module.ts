@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RhumbLike } from '../../entities/rhumb-like.entity';
-import { Rhumb } from '../../entities/rhumb.entity';
-import { User } from '../../entities/user.entity';
+import { RhumbsLikes } from '../../entities/rhumbs-likes.entity';
+import { Rhumbs } from '../../entities/rhumbs.entity';
+import { Users } from '../../entities/users.entity';
 import { RhumbsController } from './controllers/rhumbs.controller';
 import { TypeORMRhumbsRepository } from './repositories/typeorm-rhumbs.repository';
 import { MinioService } from './services/minio.service';
 import { RhumbsService } from './services/rhumbs.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Rhumb, User, RhumbLike])],
+  imports: [TypeOrmModule.forFeature([Rhumbs, Users, RhumbsLikes])],
   controllers: [RhumbsController],
   providers: [RhumbsService, TypeORMRhumbsRepository, MinioService],
 })

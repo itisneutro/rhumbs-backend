@@ -5,7 +5,7 @@
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000/api" },
-    { "key": "rhumbId", "value": "" }
+    { "key": "rhumbsId", "value": "" }
   ],
   "item": [
     {
@@ -29,7 +29,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.collectionVariables.set('rhumbId', pm.response.json().id);"
+              "pm.collectionVariables.set('rhumbsId', pm.response.json().id);"
             ]
           }
         }
@@ -75,9 +75,9 @@
           "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geographicAzimuthDeg\": 45,\n  \"magneticAzimuthDeg\": 33.5\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/rhumbs/{{rhumbId}}/publish",
+          "raw": "{{baseUrl}}/rhumbs/draft/publish",
           "host": ["{{baseUrl}}"],
-          "path": ["rhumbs", "{{rhumbId}}", "publish"]
+          "path": ["rhumbs", "draft", "publish"]
         }
       }
     },
@@ -99,9 +99,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/rhumbs/feed/{{rhumbId}}?next=true",
+          "raw": "{{baseUrl}}/rhumbs/feed/{{rhumbsId}}?next=true",
           "host": ["{{baseUrl}}"],
-          "path": ["rhumbs", "feed", "{{rhumbId}}"],
+          "path": ["rhumbs", "feed", "{{rhumbsId}}"],
           "query": [{ "key": "next", "value": "true" }]
         }
       }
@@ -117,9 +117,9 @@
           "raw": "{\n  \"value\": 1\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/rhumbs/{{rhumbId}}/like",
+          "raw": "{{baseUrl}}/rhumbs/{{rhumbsId}}/like",
           "host": ["{{baseUrl}}"],
-          "path": ["rhumbs", "{{rhumbId}}", "like"]
+          "path": ["rhumbs", "{{rhumbsId}}", "like"]
         }
       }
     },
@@ -129,9 +129,9 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/rhumbs/{{rhumbId}}",
+          "raw": "{{baseUrl}}/rhumbs/{{rhumbsId}}",
           "host": ["{{baseUrl}}"],
-          "path": ["rhumbs", "{{rhumbId}}"]
+          "path": ["rhumbs", "{{rhumbsId}}"]
         }
       }
     },

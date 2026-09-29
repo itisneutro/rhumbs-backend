@@ -9,7 +9,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class PublishRhumbDto {
+export class PublishRhumbsDto {
   @IsString()
   @MaxLength(64)
   name: string;

@@ -1,56 +1,56 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { RhumbLike } from '../../../entities/rhumb-like.entity';
-import { Rhumb } from '../../../entities/rhumb.entity';
+import { RhumbsLikes } from '../../../entities/rhumbs-likes.entity';
+import { Rhumbs } from '../../../entities/rhumbs.entity';
 
-export type RhumbWithLikes = { rhumb: Rhumb; likesCount: number };
+export type RhumbsWithLikes = { rhumbs: Rhumbs; likesCount: number };
 
 @Injectable()
 export class TypeORMRhumbsRepository {
   constructor(
-    @InjectRepository(Rhumb)
-    private readonly rhumbs: Repository<Rhumb>,
-    @InjectRepository(RhumbLike)
-    private readonly likes: Repository<RhumbLike>,
+    @InjectRepository(Rhumbs)
+    private readonly rhumbsRepository: Repository<Rhumbs>,
+    @InjectRepository(RhumbsLikes)
+    private readonly likesRepository: Repository<RhumbsLikes>,
   ) {}
 
-  async findPublished(minAzimuth?: number): Promise<RhumbWithLikes[]> {
-    const query = this.rhumbs
-      .createQueryBuilder('rhumb')
-      .leftJoin(RhumbLike, 'like', 'like.rhumb_id = rhumb.id')
+  async findPublished(minAzimuth?: number): Promise<RhumbsWithLikes[]> {
+    const query = this.rhumbsRepository
+      .createQueryBuilder('rhumbs')
+      .leftJoin(RhumbsLikes, 'like', 'like.rhumbs_id = rhumbs.id')
       .addSelect('COUNT(like.id)', 'likes_count')
-      .where('rhumb.status = :status', { status: 'published' })
-      .groupBy('rhumb.id')
-      .orderBy('rhumb.id', 'ASC');
+      .where('rhumbs.status = :status', { status: 'published' })
+      .groupBy('rhumbs.id')
+      .orderBy('rhumbs.id', 'ASC');
 
     if (minAzimuth !== undefined) {
-      query.andWhere('rhumb.geographicAzimuthDeg >= :minAzimuth', {
+      query.andWhere('rhumbs.geographicAzimuthDeg >= :minAzimuth', {
         minAzimuth,
       });
     }
 
     const { entities, raw } = await query.getRawAndEntities();
 
-    return entities.map((rhumb, index) => ({
-      rhumb,
+    return entities.map((rhumbs, index) => ({
+      rhumbs,
       likesCount: Number(raw[index].likes_count),
     }));
   }
 
-  async findFirstPublished(): Promise<Rhumb | null> {
-    return this.rhumbs.findOne({
+  async findFirstPublished(): Promise<Rhumbs | null> {
+    return this.rhumbsRepository.findOne({
       where: { status: 'published' },
       order: { id: 'ASC' },
     });
   }
 
-  async findPublishedById(id: number): Promise<Rhumb | null> {
-    return this.rhumbs.findOne({ where: { id, status: 'published' } });
+  async findPublishedById(id: number): Promise<Rhumbs | null> {
+    return this.rhumbsRepository.findOne({ where: { id, status: 'published' } });
   }
 
-  async findNextPublished(id: number): Promise<Rhumb | null> {
-    const next = await this.rhumbs.findOne({
+  async findNextPublished(id: number): Promise<Rhumbs | null> {
+    const next = await this.rhumbsRepository.findOne({
       where: { status: 'published', id: MoreThan(id) },
       order: { id: 'ASC' },
     });
@@ -58,30 +58,24 @@ export class TypeORMRhumbsRepository {
     return next ?? this.findFirstPublished();
   }
 
-  async findDraftByUser(userId: number): Promise<Rhumb | null> {
-    return this.rhumbs.findOne({
+  async findDraftByUser(userId: number): Promise<Rhumbs | null> {
+    return this.rhumbsRepository.findOne({
       where: { status: 'draft', creatorId: userId },
       order: { id: 'ASC' },
-    });
-  }
-
-  async findDraftByIdAndUser(id: number, userId: number): Promise<Rhumb | null> {
-    return this.rhumbs.findOne({
-      where: { id, status: 'draft', creatorId: userId },
     });
   }
 
   async findPublishedByIdAndUser(
     id: number,
     userId: number,
-  ): Promise<Rhumb | null> {
-    return this.rhumbs.findOne({
+  ): Promise<Rhumbs | null> {
+    return this.rhumbsRepository.findOne({
       where: { id, status: 'published', creatorId: userId },
     });
   }
 
-  async createDraft(name: string, creatorId: number): Promise<Rhumb> {
-    const draft = this.rhumbs.create({
+  async createDraft(name: string, creatorId: number): Promise<Rhumbs> {
+    const draft = this.rhumbsRepository.create({
       name,
       description: null,
       imageKey: '',
@@ -93,26 +87,26 @@ export class TypeORMRhumbsRepository {
       formedAt: null,
     });
 
-    return this.rhumbs.save(draft);
+    return this.rhumbsRepository.save(draft);
   }
 
-  async save(rhumb: Rhumb): Promise<Rhumb> {
-    return this.rhumbs.save(rhumb);
+  async save(rhumbs: Rhumbs): Promise<Rhumbs> {
+    return this.rhumbsRepository.save(rhumbs);
   }
 
-  async countLikes(rhumbId: number): Promise<number> {
-    return this.likes.count({ where: { rhumbId } });
+  async countLikes(rhumbsId: number): Promise<number> {
+    return this.likesRepository.count({ where: { rhumbsId } });
   }
 
-  async findLike(userId: number, rhumbId: number): Promise<RhumbLike | null> {
-    return this.likes.findOne({ where: { userId, rhumbId } });
+  async findLike(userId: number, rhumbsId: number): Promise<RhumbsLikes | null> {
+    return this.likesRepository.findOne({ where: { userId, rhumbsId } });
   }
 
-  async addLike(userId: number, rhumbId: number): Promise<void> {
-    await this.likes.save(this.likes.create({ userId, rhumbId }));
+  async addLike(userId: number, rhumbsId: number): Promise<void> {
+    await this.likesRepository.save(this.likesRepository.create({ userId, rhumbsId }));
   }
 
-  async removeLike(like: RhumbLike): Promise<void> {
-    await this.likes.remove(like);
+  async removeLike(like: RhumbsLikes): Promise<void> {
+    await this.likesRepository.remove(like);
   }
 }

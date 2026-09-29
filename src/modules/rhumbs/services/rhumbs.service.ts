@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { CurrentUser } from '../../../common/current-user';
-import { Rhumb } from '../../../entities/rhumb.entity';
-import { PublishRhumbDto } from '../dto/publish-rhumb.dto';
-import { RhumbResponseDto } from '../dto/rhumb-response.dto';
+import { Rhumbs } from '../../../entities/rhumbs.entity';
+import { PublishRhumbsDto } from '../dto/publish-rhumbs.dto';
+import { RhumbsResponseDto } from '../dto/rhumbs-response.dto';
 import { TypeORMRhumbsRepository } from '../repositories/typeorm-rhumbs.repository';
 import { MinioService } from './minio.service';
 
-export type RhumbFiles = {
+export type RhumbsFiles = {
   image?: Express.Multer.File[];
   video?: Express.Multer.File[];
 };
@@ -17,39 +17,39 @@ const IMAGE_LIMIT = 5 * 1024 * 1024;
 @Injectable()
 export class RhumbsService {
   constructor(
-    private readonly rhumbs: TypeORMRhumbsRepository,
+    private readonly rhumbsRepository: TypeORMRhumbsRepository,
     private readonly minio: MinioService,
   ) {}
 
-  async findPublished(minAzimuth?: number): Promise<RhumbResponseDto[]> {
-    const rows = await this.rhumbs.findPublished(minAzimuth);
+  async findPublished(minAzimuth?: number): Promise<RhumbsResponseDto[]> {
+    const rows = await this.rhumbsRepository.findPublished(minAzimuth);
 
-    return rows.map(({ rhumb, likesCount }) => this.toResponse(rhumb, likesCount));
+    return rows.map(({ rhumbs, likesCount }) => this.toResponse(rhumbs, likesCount));
   }
 
-  async findFeed(id?: number, next?: boolean): Promise<RhumbResponseDto> {
+  async findFeed(id?: number, next?: boolean): Promise<RhumbsResponseDto> {
     if (id === undefined) {
-      return this.withLikes(await this.rhumbs.findFirstPublished());
+      return this.withLikes(await this.rhumbsRepository.findFirstPublished());
     }
 
-    const rhumb = next
-      ? await this.rhumbs.findNextPublished(id)
-      : await this.rhumbs.findPublishedById(id);
+    const rhumbs = next
+      ? await this.rhumbsRepository.findNextPublished(id)
+      : await this.rhumbsRepository.findPublishedById(id);
 
-    return this.withLikes(rhumb);
+    return this.withLikes(rhumbs);
   }
 
-  async findDraft(): Promise<RhumbResponseDto> {
-    const draft = await this.rhumbs.findDraftByUser(
+  async findDraft(): Promise<RhumbsResponseDto> {
+    const draft = await this.rhumbsRepository.findDraftByUser(
       CurrentUser.getInstance().getId(),
     );
 
     return this.withLikes(draft);
   }
 
-  async createDraft(name: string, files: RhumbFiles): Promise<RhumbResponseDto> {
+  async createDraft(name: string, files: RhumbsFiles): Promise<RhumbsResponseDto> {
     const userId = CurrentUser.getInstance().getId();
-    const existing = await this.rhumbs.findDraftByUser(userId);
+    const existing = await this.rhumbsRepository.findDraftByUser(userId);
 
     if (existing) {
       throw new BadRequestException();
@@ -62,7 +62,7 @@ export class RhumbsService {
       throw new BadRequestException();
     }
 
-    const draft = await this.rhumbs.createDraft(name, userId);
+    const draft = await this.rhumbsRepository.createDraft(name, userId);
 
     if (image) {
       draft.imageKey = await this.minio.uploadImage(draft.id, image);
@@ -73,18 +73,14 @@ export class RhumbsService {
     }
 
     if (image || video) {
-      await this.rhumbs.save(draft);
+      await this.rhumbsRepository.save(draft);
     }
 
     return this.toResponse(draft, 0);
   }
 
-  async publishDraft(
-    id: number,
-    payload: PublishRhumbDto,
-  ): Promise<RhumbResponseDto> {
-    const draft = await this.rhumbs.findDraftByIdAndUser(
-      id,
+  async publishDraft(payload: PublishRhumbsDto): Promise<RhumbsResponseDto> {
+    const draft = await this.rhumbsRepository.findDraftByUser(
       CurrentUser.getInstance().getId(),
     );
 
@@ -99,13 +95,13 @@ export class RhumbsService {
     draft.status = 'published';
     draft.formedAt = new Date();
 
-    const published = await this.rhumbs.save(draft);
+    const published = await this.rhumbsRepository.save(draft);
 
     return this.withLikes(published);
   }
 
   async markDeleted(id: number): Promise<void> {
-    const published = await this.rhumbs.findPublishedByIdAndUser(
+    const published = await this.rhumbsRepository.findPublishedByIdAndUser(
       id,
       CurrentUser.getInstance().getId(),
     );
@@ -116,54 +112,54 @@ export class RhumbsService {
 
     published.status = 'deleted';
 
-    await this.rhumbs.save(published);
+    await this.rhumbsRepository.save(published);
   }
 
-  async setLike(id: number, value: number): Promise<RhumbResponseDto> {
-    const rhumb = await this.rhumbs.findPublishedById(id);
+  async setLike(id: number, value: number): Promise<RhumbsResponseDto> {
+    const rhumbs = await this.rhumbsRepository.findPublishedById(id);
 
-    if (!rhumb) {
+    if (!rhumbs) {
       throw new NotFoundException();
     }
 
     const userId = CurrentUser.getInstance().getId();
-    const like = await this.rhumbs.findLike(userId, id);
+    const like = await this.rhumbsRepository.findLike(userId, id);
 
     if (value === 1 && !like) {
-      await this.rhumbs.addLike(userId, id);
+      await this.rhumbsRepository.addLike(userId, id);
     }
 
     if (value === 0 && like) {
-      await this.rhumbs.removeLike(like);
+      await this.rhumbsRepository.removeLike(like);
     }
 
-    return this.withLikes(rhumb);
+    return this.withLikes(rhumbs);
   }
 
-  private async withLikes(rhumb: Rhumb | null): Promise<RhumbResponseDto> {
-    if (!rhumb) {
+  private async withLikes(rhumbs: Rhumbs | null): Promise<RhumbsResponseDto> {
+    if (!rhumbs) {
       throw new NotFoundException();
     }
 
-    const likesCount = await this.rhumbs.countLikes(rhumb.id);
+    const likesCount = await this.rhumbsRepository.countLikes(rhumbs.id);
 
-    return this.toResponse(rhumb, likesCount);
+    return this.toResponse(rhumbs, likesCount);
   }
 
-  private toResponse(rhumb: Rhumb, likesCount: number): RhumbResponseDto {
+  private toResponse(rhumbs: Rhumbs, likesCount: number): RhumbsResponseDto {
     return plainToInstance(
-      RhumbResponseDto,
+      RhumbsResponseDto,
       {
-        id: rhumb.id,
-        name: rhumb.name,
-        description: rhumb.description,
-        imageUrl: this.minio.buildUrl(rhumb.imageKey),
-        videoUrl: this.minio.buildUrl(rhumb.videoKey),
-        geographicAzimuthDeg: rhumb.geographicAzimuthDeg,
-        magneticAzimuthDeg: rhumb.magneticAzimuthDeg,
+        id: rhumbs.id,
+        name: rhumbs.name,
+        description: rhumbs.description,
+        imageUrl: this.minio.buildUrl(rhumbs.imageKey),
+        videoUrl: this.minio.buildUrl(rhumbs.videoKey),
+        geographicAzimuthDeg: rhumbs.geographicAzimuthDeg,
+        magneticAzimuthDeg: rhumbs.magneticAzimuthDeg,
         likesCount,
         isCreator:
-          rhumb.creatorId === CurrentUser.getInstance().getId() ? 1 : 0,
+          rhumbs.creatorId === CurrentUser.getInstance().getId() ? 1 : 0,
       },
       { excludeExtraneousValues: true },
     );

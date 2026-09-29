@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-export class CreateRhumbDto {
+export class CreateRhumbsDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(64)

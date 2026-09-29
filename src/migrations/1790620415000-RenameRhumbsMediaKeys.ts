@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class RenameRhumbMediaKeys1790620415000 implements MigrationInterface {
-  name = 'RenameRhumbMediaKeys1790620415000';
+export class RenameRhumbsMediaKeys1790620415000 implements MigrationInterface {
+  name = 'RenameRhumbsMediaKeys1790620415000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(

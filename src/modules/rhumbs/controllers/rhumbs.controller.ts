@@ -16,13 +16,13 @@ import {
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { CreateRhumbDto } from '../dto/create-rhumb.dto';
-import { LikeRhumbDto } from '../dto/like-rhumb.dto';
-import { PublishRhumbDto } from '../dto/publish-rhumb.dto';
-import { RhumbResponseDto } from '../dto/rhumb-response.dto';
-import { FeedQueryDto, RhumbsQueryDto } from '../dto/rhumbs-query.dto';
+import { CreateRhumbsDto } from '../dto/create-rhumbs.dto';
+import { LikeRhumbsDto } from '../dto/like-rhumbs.dto';
+import { PublishRhumbsDto } from '../dto/publish-rhumbs.dto';
+import { RhumbsResponseDto } from '../dto/rhumbs-response.dto';
+import { RhumbsFeedQueryDto, RhumbsQueryDto } from '../dto/rhumbs-query.dto';
 import { RhumbsService } from '../services/rhumbs.service';
-import type { RhumbFiles } from '../services/rhumbs.service';
+import type { RhumbsFiles } from '../services/rhumbs.service';
 
 const VIDEO_LIMIT = 50 * 1024 * 1024;
 
@@ -55,20 +55,20 @@ export class RhumbsController {
   constructor(private readonly rhumbs: RhumbsService) {}
 
   @Get()
-  async list(@Query() query: RhumbsQueryDto): Promise<RhumbResponseDto[]> {
+  async list(@Query() query: RhumbsQueryDto): Promise<RhumbsResponseDto[]> {
     return this.rhumbs.findPublished(query.minAzimuth);
   }
 
   @Get(['feed', 'feed/:id'])
   async feed(
     @Param('id', new ParseIntPipe({ optional: true })) id: number | undefined,
-    @Query() query: FeedQueryDto,
-  ): Promise<RhumbResponseDto> {
+    @Query() query: RhumbsFeedQueryDto,
+  ): Promise<RhumbsResponseDto> {
     return this.rhumbs.findFeed(id, query.next);
   }
 
   @Get('draft')
-  async draft(): Promise<RhumbResponseDto> {
+  async draft(): Promise<RhumbsResponseDto> {
     return this.rhumbs.findDraft();
   }
 
@@ -76,19 +76,18 @@ export class RhumbsController {
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(uploads)
   async create(
-    @Body() payload: CreateRhumbDto,
-    @UploadedFiles() files: RhumbFiles,
-  ): Promise<RhumbResponseDto> {
+    @Body() payload: CreateRhumbsDto,
+    @UploadedFiles() files: RhumbsFiles,
+  ): Promise<RhumbsResponseDto> {
     return this.rhumbs.createDraft(payload.name, files ?? {});
   }
 
-  @Put(':id/publish')
+  @Put('draft/publish')
   @HttpCode(HttpStatus.OK)
   async publish(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() payload: PublishRhumbDto,
-  ): Promise<RhumbResponseDto> {
-    return this.rhumbs.publishDraft(id, payload);
+    @Body() payload: PublishRhumbsDto,
+  ): Promise<RhumbsResponseDto> {
+    return this.rhumbs.publishDraft(payload);
   }
 
   @Delete(':id')
@@ -101,8 +100,8 @@ export class RhumbsController {
   @HttpCode(HttpStatus.OK)
   async like(
     @Param('id', ParseIntPipe) id: number,
-    @Body() payload: LikeRhumbDto,
-  ): Promise<RhumbResponseDto> {
+    @Body() payload: LikeRhumbsDto,
+  ): Promise<RhumbsResponseDto> {
     return this.rhumbs.setLike(id, payload.value);
   }
 }

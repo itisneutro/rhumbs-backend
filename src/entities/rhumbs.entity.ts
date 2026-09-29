@@ -5,12 +5,12 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { Users } from './users.entity';
 
-export type RhumbStatus = 'draft' | 'published' | 'deleted';
+export type RhumbsStatus = 'draft' | 'published' | 'deleted';
 
 @Entity('rhumbs')
-export class Rhumb {
+export class Rhumbs {
   @PrimaryGeneratedColumn({ type: 'integer', name: 'id' })
   id: number;
 
@@ -42,9 +42,9 @@ export class Rhumb {
     name: 'status',
     type: 'enum',
     enum: ['draft', 'published', 'deleted'],
-    enumName: 'rhumb_status',
+    enumName: 'rhumbs_status',
   })
-  status: RhumbStatus;
+  status: RhumbsStatus;
 
   @Column({ name: 'geographic_azimuth_deg', type: 'smallint', nullable: true })
   geographicAzimuthDeg: number | null;
@@ -64,9 +64,9 @@ export class Rhumb {
   @Column({ name: 'creator_id', type: 'integer' })
   creatorId: number;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => Users, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'creator_id' })
-  creator: User;
+  creator: Users;
 
   @Column({ name: 'formed_at', type: 'timestamptz', nullable: true })
   formedAt: Date | null;

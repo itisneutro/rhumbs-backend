@@ -67,11 +67,11 @@ describe('RhumbsController (e2e)', () => {
 
     expect(rhumbs.length).toBeGreaterThan(0);
 
-    for (const rhumb of rhumbs) {
-      expect([0, 1]).toContain(rhumb.isCreator);
+    for (const item of rhumbs) {
+      expect([0, 1]).toContain(item.isCreator);
     }
 
-    const own = rhumbs.find((rhumb) => rhumb.id === 1);
+    const own = rhumbs.find((one) => one.id === 1);
 
     expect(own?.isCreator).toBe(1);
   });

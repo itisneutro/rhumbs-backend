@@ -10,7 +10,7 @@ export class RhumbsQueryDto {
   minAzimuth?: number;
 }
 
-export class FeedQueryDto {
+export class RhumbsFeedQueryDto {
   @IsOptional()
   @Transform(({ value }) => {
     if (value === 'true' || value === true) {

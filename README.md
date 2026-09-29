@@ -23,7 +23,7 @@ Adminer — http://localhost:8081, консоль Minio — http://localhost:900
 В настройках Postman указать **Working directory** — корень репозитория, иначе
 запрос с файлами не найдёт `postman/files/rhumbs-demo.jpg` и `.mp4`.
 Коллекция из 10 запросов выполняется по порядку: второй запрос сохраняет id
-созданного румба в переменную `rhumbId`, её используют запросы 4, 6, 7 и 8.
+созданного румба в переменную `rhumbsId`, её используют запросы 6, 7 и 8.
 
 Прогон из командной строки:
 
@@ -42,7 +42,7 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 | GET | `/rhumbs/feed[/:id]?next=true` | — | румб | 200, 400, 404 |
 | GET | `/rhumbs/draft` | — | румб | 200, 404 |
 | POST | `/rhumbs` | `multipart/form-data`: `name`, `image`, `video` | румб | 201, 400 |
-| PUT | `/rhumbs/:id/publish` | JSON: `name`, `description`, `geographicAzimuthDeg`, `magneticAzimuthDeg` | румб | 200, 400, 404 |
+| PUT | `/rhumbs/draft/publish` | JSON: `name`, `description`, `geographicAzimuthDeg`, `magneticAzimuthDeg` | румб | 200, 404 |
 | DELETE | `/rhumbs/:id` | — | пусто | 200, 400, 404 |
 | POST | `/rhumbs/:id/like` | JSON: `value` (0 или 1) | румб | 200, 400, 404 |
 | POST | `/users` | JSON: `login`, `password` | `{ id, login }` | 201, 400 |
@@ -56,7 +56,8 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 0–359.9 с одним знаком после запятой, `minAzimuth` — целое 0–359,
 `image` — изображение до 5 МБ, `video` — mp4 до 50 МБ, `login` — до 64 символов,
 `password` — до 72 байт (ограничение bcrypt). Файлы при создании необязательны.
-Черновик у пользователя один: повторный `POST /rhumbs` даёт 400.
+Черновик у пользователя один: повторный `POST /rhumbs` даёт 400, а публикации
+id не нужен — черновик ищется по текущему пользователю.
 
 ### Румб в ответе
 
@@ -92,7 +93,7 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 | `description` | varchar(512) | NULL | |
 | `image_key` | varchar(256) | NOT NULL | по умолчанию `''` |
 | `video_key` | varchar(256) | NOT NULL | по умолчанию `''` |
-| `status` | rhumb_status | NOT NULL | перечисление `draft` / `published` / `deleted` |
+| `status` | rhumbs_status | NOT NULL | перечисление `draft` / `published` / `deleted` |
 | `geographic_azimuth_deg` | smallint | NULL | |
 | `magnetic_azimuth_deg` | numeric(4,1) | NULL | |
 | `created_at` | timestamptz | NOT NULL | по умолчанию `now()` |
@@ -116,9 +117,9 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 |---|---|---|---|
 | `id` | integer | NOT NULL | PRIMARY KEY, `nextval('rhumbs_likes_id_seq')` |
 | `user_id` | integer | NOT NULL | FOREIGN KEY → `users.id`, ON DELETE RESTRICT |
-| `rhumb_id` | integer | NOT NULL | FOREIGN KEY → `rhumbs.id`, ON DELETE RESTRICT |
+| `rhumbs_id` | integer | NOT NULL | FOREIGN KEY → `rhumbs.id`, ON DELETE RESTRICT |
 
-UNIQUE `uq_rhumbs_likes_user_rhumb` на пару (`rhumb_id`, `user_id`):
+UNIQUE `uq_rhumbs_likes` на пару (`user_id`, `rhumbs_id`):
 один пользователь ставит румбу не больше одного лайка. Каскадного удаления нет.
 
 ## Правила ответов

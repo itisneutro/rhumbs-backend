@@ -1,17 +1,21 @@
 BEGIN;
 
-DELETE FROM rhumbs_likes WHERE rhumb_id > 8;
+DELETE FROM rhumbs_likes;
 DELETE FROM rhumbs WHERE id > 8;
-DELETE FROM rhumbs_likes WHERE user_id > 6;
 DELETE FROM users WHERE id > 6;
+
+INSERT INTO rhumbs_likes (id, user_id, rhumbs_id) VALUES
+  (1, 4, 1), (2, 4, 4), (3, 4, 7),
+  (4, 5, 1), (5, 5, 3), (6, 5, 5),
+  (7, 6, 1), (8, 6, 3), (9, 6, 4);
 
 UPDATE users SET password = '$2b$10$9t./3.aXgm9dpFliELxlq.GuP4FTJ/zaYizl4CgbN6H/Nxnbq4wTm' WHERE id = 4;
 UPDATE users SET password = '$2b$10$lXElNIDfMEmfOn0sBMFv6OecSohSVexfRjtGClFdfBbNogyGnRry.' WHERE id = 5;
 UPDATE users SET password = '$2b$10$/qmAexUtFRsGAv6D2YLoUeJsjrivWsYZs0iR8jxmzYjPZmnYFNfDy' WHERE id = 6;
 
-UPDATE rhumbs SET status = 'published'::rhumb_status WHERE id IN (1, 2, 3, 4, 5, 7);
-UPDATE rhumbs SET status = 'deleted'::rhumb_status   WHERE id = 6;
-UPDATE rhumbs SET status = 'draft'::rhumb_status     WHERE id = 8;
+UPDATE rhumbs SET status = 'published'::rhumbs_status WHERE id IN (1, 2, 3, 4, 5, 7);
+UPDATE rhumbs SET status = 'deleted'::rhumbs_status   WHERE id = 6;
+UPDATE rhumbs SET status = 'draft'::rhumbs_status     WHERE id = 8;
 
 UPDATE rhumbs AS r
    SET geographic_azimuth_deg = s.geo,

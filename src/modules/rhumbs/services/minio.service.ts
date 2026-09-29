@@ -30,11 +30,11 @@ export class MinioService {
   }
 
   async uploadImage(
-    rhumbId: number,
+    rhumbsId: number,
     file: Express.Multer.File,
   ): Promise<string> {
     const extension = IMAGE_EXTENSIONS[file.mimetype] ?? 'jpg';
-    const key = `rhumbs-${rhumbId}-image-${Date.now()}.${extension}`;
+    const key = `rhumbs-${rhumbsId}-image-${Date.now()}.${extension}`;
 
     await this.put(key, file);
 
@@ -42,10 +42,10 @@ export class MinioService {
   }
 
   async uploadVideo(
-    rhumbId: number,
+    rhumbsId: number,
     file: Express.Multer.File,
   ): Promise<string> {
-    const key = `rhumbs-${rhumbId}-video-${Date.now()}.mp4`;
+    const key = `rhumbs-${rhumbsId}-video-${Date.now()}.mp4`;
 
     await this.put(key, file);
 
