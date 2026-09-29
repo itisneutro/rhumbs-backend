@@ -41,7 +41,7 @@ VALUES (7, 'Западный', 'Ветер с запада. Попутная с�
         '2026-02-14 08:35:00+00', 4, '2026-02-14 09:25:00+00');
 INSERT INTO rhumbs (id, name, description, image_key, video_key, status,
                     geographic_azimuth_deg, magnetic_azimuth_deg, created_at, creator_id, formed_at)
-VALUES (8, 'Северо-западный', NULL, '', '',
+VALUES (8, 'Северо-западный', NULL, 'rhumbs-north-west.jpg', 'rhumbs-north-west.mp4',
         'draft'::rhumbs_status, NULL, NULL,
         '2026-02-14 08:50:00+00', 5, NULL);
 

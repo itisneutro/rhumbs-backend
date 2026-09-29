@@ -30,8 +30,8 @@ UPDATE rhumbs
        geographic_azimuth_deg = NULL,
        magnetic_azimuth_deg = NULL,
        formed_at = NULL,
-       image_key = '',
-       video_key = ''
+       image_key = 'rhumbs-north-west.jpg',
+       video_key = 'rhumbs-north-west.mp4'
  WHERE id = 8;
 
 SELECT setval('users_id_seq', 6, true);
