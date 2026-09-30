@@ -4,7 +4,11 @@ import { MoreThan, Repository } from 'typeorm';
 import { RhumbsLikes } from '../../../entities/rhumbs-likes.entity';
 import { Rhumbs } from '../../../entities/rhumbs.entity';
 
-export type RhumbsWithLikes = { rhumbs: Rhumbs; likesCount: number };
+export type RhumbsWithLikes = {
+  rhumbs: Rhumbs;
+  likesCount: number;
+  isLiked: number;
+};
 
 @Injectable()
 export class TypeORMRhumbsRepository {
@@ -15,17 +19,26 @@ export class TypeORMRhumbsRepository {
     private readonly likesRepository: Repository<RhumbsLikes>,
   ) {}
 
-  async findPublished(minAzimuth?: number): Promise<RhumbsWithLikes[]> {
+  async findPublished(
+    userId: number,
+    minAzimuth?: number,
+  ): Promise<RhumbsWithLikes[]> {
     const query = this.rhumbsRepository
       .createQueryBuilder('rhumbs')
       .leftJoin(RhumbsLikes, 'like', 'like.rhumbs_id = rhumbs.id')
       .addSelect('COUNT(like.id)', 'likes_count')
+      .addSelect(
+        `EXISTS (SELECT 1 FROM rhumbs_likes own
+                  WHERE own.rhumbs_id = rhumbs.id AND own.user_id = :userId)`,
+        'is_liked',
+      )
       .where('rhumbs.status = :status', { status: 'published' })
+      .setParameter('userId', userId)
       .groupBy('rhumbs.id')
       .orderBy('rhumbs.id', 'ASC');
 
     if (minAzimuth !== undefined) {
-      query.andWhere('rhumbs.geographicAzimuthDeg >= :minAzimuth', {
+      query.andWhere('rhumbs.geoAzimuth >= :minAzimuth', {
         minAzimuth,
       });
     }
@@ -35,6 +48,7 @@ export class TypeORMRhumbsRepository {
     return entities.map((rhumbs, index) => ({
       rhumbs,
       likesCount: Number(raw[index].likes_count),
+      isLiked: raw[index].is_liked ? 1 : 0,
     }));
   }
 
@@ -81,8 +95,8 @@ export class TypeORMRhumbsRepository {
       imageKey: '',
       videoKey: '',
       status: 'draft',
-      geographicAzimuthDeg: null,
-      magneticAzimuthDeg: null,
+      geoAzimuth: null,
+      magAzimuth: null,
       creatorId,
       formedAt: null,
     });
@@ -100,6 +114,10 @@ export class TypeORMRhumbsRepository {
 
   async findLike(userId: number, rhumbsId: number): Promise<RhumbsLikes | null> {
     return this.likesRepository.findOne({ where: { userId, rhumbsId } });
+  }
+
+  async existsLike(userId: number, rhumbsId: number): Promise<boolean> {
+    return this.likesRepository.exists({ where: { userId, rhumbsId } });
   }
 
   async addLike(userId: number, rhumbsId: number): Promise<void> {

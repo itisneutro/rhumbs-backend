@@ -13,13 +13,13 @@ UPDATE users SET password = '$2b$10$9t./3.aXgm9dpFliELxlq.GuP4FTJ/zaYizl4CgbN6H/
 UPDATE users SET password = '$2b$10$lXElNIDfMEmfOn0sBMFv6OecSohSVexfRjtGClFdfBbNogyGnRry.' WHERE id = 5;
 UPDATE users SET password = '$2b$10$/qmAexUtFRsGAv6D2YLoUeJsjrivWsYZs0iR8jxmzYjPZmnYFNfDy' WHERE id = 6;
 
-UPDATE rhumbs SET status = 'published'::rhumbs_status WHERE id IN (1, 2, 3, 4, 5, 7);
-UPDATE rhumbs SET status = 'deleted'::rhumbs_status   WHERE id = 6;
-UPDATE rhumbs SET status = 'draft'::rhumbs_status     WHERE id = 8;
+UPDATE rhumbs SET status = 'published' WHERE id IN (1, 2, 3, 4, 5, 7);
+UPDATE rhumbs SET status = 'deleted'   WHERE id = 6;
+UPDATE rhumbs SET status = 'draft'     WHERE id = 8;
 
 UPDATE rhumbs AS r
-   SET geographic_azimuth_deg = s.geo,
-       magnetic_azimuth_deg = s.mag
+   SET geo_azimuth = s.geo,
+       mag_azimuth = s.mag
   FROM (VALUES (1,   0, 348.5), (2,  45,  33.5), (3,  90,  78.5), (4, 135, 123.5),
                (5, 180, 168.5), (6, 225, 213.5), (7, 270, 258.5)) AS s (id, geo, mag)
  WHERE r.id = s.id;
@@ -27,8 +27,8 @@ UPDATE rhumbs AS r
 UPDATE rhumbs
    SET creator_id = 5,
        description = NULL,
-       geographic_azimuth_deg = NULL,
-       magnetic_azimuth_deg = NULL,
+       geo_azimuth = NULL,
+       mag_azimuth = NULL,
        formed_at = NULL,
        image_key = 'rhumbs-north-west.jpg',
        video_key = 'rhumbs-north-west.mp4'

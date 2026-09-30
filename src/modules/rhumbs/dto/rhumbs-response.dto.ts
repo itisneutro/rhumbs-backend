@@ -21,11 +21,11 @@ export class RhumbsResponseDto {
 
   @Expose()
   @Transform(toNumberOrNull)
-  geographicAzimuthDeg: number | null;
+  geoAzimuth: number | null;
 
   @Expose()
   @Transform(toNumberOrNull)
-  magneticAzimuthDeg: number | null;
+  magAzimuth: number | null;
 
   @Expose()
   @Transform(({ value }) => Number(value ?? 0))
@@ -33,4 +33,7 @@ export class RhumbsResponseDto {
 
   @Expose()
   isCreator: number;
+
+  @Expose()
+  isLiked: number;
 }

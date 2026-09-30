@@ -63,17 +63,43 @@ describe('RhumbsController (e2e)', () => {
       .get('/api/rhumbs')
       .expect(200);
 
-    const rhumbs = response.body as { id: number; isCreator: number }[];
+    const rhumbs = response.body as {
+      id: number;
+      isCreator: number;
+      isLiked: number;
+    }[];
 
     expect(rhumbs.length).toBeGreaterThan(0);
 
     for (const item of rhumbs) {
       expect([0, 1]).toContain(item.isCreator);
+      expect([0, 1]).toContain(item.isLiked);
     }
 
     const own = rhumbs.find((one) => one.id === 1);
 
     expect(own?.isCreator).toBe(1);
+    expect(own?.isLiked).toBe(1);
+
+    const foreign = rhumbs.find((one) => one.id === 3);
+
+    expect(foreign?.isLiked).toBe(0);
+  });
+
+  it('/api/rhumbs/:id/like (POST): isLiked отражает новое состояние', async () => {
+    const liked = await request(app.getHttpServer() as App)
+      .post('/api/rhumbs/2/like')
+      .send({ value: 1 })
+      .expect(200);
+
+    expect((liked.body as { isLiked: number }).isLiked).toBe(1);
+
+    const unliked = await request(app.getHttpServer() as App)
+      .post('/api/rhumbs/2/like')
+      .send({ value: 0 })
+      .expect(200);
+
+    expect((unliked.body as { isLiked: number }).isLiked).toBe(0);
   });
 
   it('/api/users (POST): регистрация и занятый логин', async () => {

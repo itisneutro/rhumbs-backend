@@ -23,11 +23,11 @@ export class PublishRhumbsDto {
   @IsInt()
   @Min(0)
   @Max(359)
-  geographicAzimuthDeg: number;
+  geoAzimuth: number;
 
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 1 })
   @Min(0)
   @Max(359.9)
-  magneticAzimuthDeg: number;
+  magAzimuth: number;
 }

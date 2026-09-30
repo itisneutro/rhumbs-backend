@@ -72,7 +72,7 @@
         "body": {
           "mode": "raw",
           "options": { "raw": { "language": "json" } },
-          "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geographicAzimuthDeg\": 45,\n  \"magneticAzimuthDeg\": 33.5\n}"
+          "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geoAzimuth\": 45,\n  \"magAzimuth\": 33.5\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/rhumbs/draft/publish",

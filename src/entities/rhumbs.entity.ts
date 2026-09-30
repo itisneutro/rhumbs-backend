@@ -38,25 +38,20 @@ export class Rhumbs {
   })
   videoKey: string;
 
-  @Column({
-    name: 'status',
-    type: 'enum',
-    enum: ['draft', 'published', 'deleted'],
-    enumName: 'rhumbs_status',
-  })
+  @Column({ name: 'status', type: 'varchar', length: 16 })
   status: RhumbsStatus;
 
-  @Column({ name: 'geographic_azimuth_deg', type: 'smallint', nullable: true })
-  geographicAzimuthDeg: number | null;
+  @Column({ name: 'geo_azimuth', type: 'smallint', nullable: true })
+  geoAzimuth: number | null;
 
   @Column({
-    name: 'magnetic_azimuth_deg',
+    name: 'mag_azimuth',
     type: 'numeric',
     precision: 4,
     scale: 1,
     nullable: true,
   })
-  magneticAzimuthDeg: string | null;
+  magAzimuth: string | null;
 
   @Column({ name: 'created_at', type: 'timestamptz', default: () => 'now()' })
   createdAt: Date;

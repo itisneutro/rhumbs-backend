@@ -42,7 +42,7 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 | GET | `/rhumbs/feed[/:id]?next=true` | — | румб | 200, 400, 404 |
 | GET | `/rhumbs/draft` | — | румб | 200, 404 |
 | POST | `/rhumbs` | `multipart/form-data`: `name`, `image`, `video` | румб | 201, 400 |
-| PUT | `/rhumbs/draft/publish` | JSON: `name`, `description`, `geographicAzimuthDeg`, `magneticAzimuthDeg` | румб | 200, 400, 404 |
+| PUT | `/rhumbs/draft/publish` | JSON: `name`, `description`, `geoAzimuth`, `magAzimuth` | румб | 200, 400, 404 |
 | DELETE | `/rhumbs/:id` | — | пусто | 200, 400, 404 |
 | POST | `/rhumbs/:id/like` | JSON: `value` (0 или 1) | румб | 200, 400, 404 |
 | POST | `/users` | JSON: `login`, `password` | `{ id, login }` | 201, 400 |
@@ -52,7 +52,7 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 `/users/login` и `/users/logout` — заглушки под ЛР-4: логики в них нет.
 
 Ограничения: `name` — до 64 символов, `description` — до 512 и при публикации
-обязательно, `geographicAzimuthDeg` — целое 0–359, `magneticAzimuthDeg` —
+обязательно, `geoAzimuth` — целое 0–359, `magAzimuth` —
 0–359.9 с одним знаком после запятой, `minAzimuth` — целое 0–359,
 `image` — изображение до 5 МБ, `video` — mp4 до 50 МБ, `login` — до 64 символов,
 `password` — до 72 байт (ограничение bcrypt). Файлы при создании необязательны.
@@ -70,15 +70,20 @@ id не нужен — черновик ищется по текущему по�
 | `description` | string \| null | краткое описание, у черновика `null` |
 | `imageUrl` | string \| null | `MINIO_PUBLIC_URL` + ключ, при пустом ключе `null` |
 | `videoUrl` | string \| null | то же для видео |
-| `geographicAzimuthDeg` | number \| null | географический азимут, градусы |
-| `magneticAzimuthDeg` | number \| null | магнитный азимут, градусы с десятой долей |
+| `geoAzimuth` | number \| null | географический азимут, градусы |
+| `magAzimuth` | number \| null | магнитный азимут, градусы с десятой долей |
 | `likesCount` | number | число лайков из `rhumbs_likes` |
 | `isCreator` | number | 1, если создатель румба — текущий пользователь, иначе 0 |
+| `isLiked` | number | 1, если лайк текущего пользователя на этом румбе уже стоит, иначе 0 |
 
-`isCreator` — признак 0/1, а не булево значение. Считается при сборке ответа
-сравнением `creator_id` уже загруженной строки с текущим пользователем, самого
-`creatorId` в ответе нет. Текущий пользователь задан константой в
-`src/common/current-user.ts` (id 4), авторизация появится в ЛР-4.
+`isCreator` и `isLiked` — признаки 0/1, а не булевы значения. `isCreator`
+считается при сборке ответа сравнением `creator_id` уже загруженной строки с
+текущим пользователем, самого `creatorId` в ответе нет. `isLiked` нужен ленте,
+чтобы нарисовать кнопку лайка в нужном состоянии: в списке он приходит из того
+же запроса подзапросом `EXISTS` по `rhumbs_likes`, для одного румба — проверкой
+`exists` в репозитории; в ответе на лайк показывает уже новое состояние.
+Текущий пользователь задан константой в `src/common/current-user.ts` (id 4),
+авторизация появится в ЛР-4.
 
 Ответ пользователя — `{ id, login }`, пароль и его хэш не отдаются никогда.
 
@@ -93,9 +98,9 @@ id не нужен — черновик ищется по текущему по�
 | `description` | varchar(512) | NULL | |
 | `image_key` | varchar(256) | NOT NULL | по умолчанию `''` |
 | `video_key` | varchar(256) | NOT NULL | по умолчанию `''` |
-| `status` | rhumbs_status | NOT NULL | перечисление `draft` / `published` / `deleted` |
-| `geographic_azimuth_deg` | smallint | NULL | |
-| `magnetic_azimuth_deg` | numeric(4,1) | NULL | |
+| `status` | varchar(16) | NOT NULL | CHECK `chk_rhumbs_status`: `draft` / `published` / `deleted` |
+| `geo_azimuth` | smallint | NULL | |
+| `mag_azimuth` | numeric(4,1) | NULL | |
 | `created_at` | timestamptz | NOT NULL | по умолчанию `now()` |
 | `creator_id` | integer | NOT NULL | FOREIGN KEY → `users.id`, ON DELETE RESTRICT |
 | `formed_at` | timestamptz | NULL | проставляется при публикации |

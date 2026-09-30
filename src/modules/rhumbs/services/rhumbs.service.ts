@@ -22,9 +22,14 @@ export class RhumbsService {
   ) {}
 
   async findPublished(minAzimuth?: number): Promise<RhumbsResponseDto[]> {
-    const rows = await this.rhumbsRepository.findPublished(minAzimuth);
+    const rows = await this.rhumbsRepository.findPublished(
+      CurrentUser.getInstance().getId(),
+      minAzimuth,
+    );
 
-    return rows.map(({ rhumbs, likesCount }) => this.toResponse(rhumbs, likesCount));
+    return rows.map(({ rhumbs, likesCount, isLiked }) =>
+      this.toResponse(rhumbs, likesCount, isLiked),
+    );
   }
 
   async findFeed(id?: number, next?: boolean): Promise<RhumbsResponseDto> {
@@ -76,7 +81,7 @@ export class RhumbsService {
       await this.rhumbsRepository.save(draft);
     }
 
-    return this.toResponse(draft, 0);
+    return this.toResponse(draft, 0, 0);
   }
 
   async publishDraft(payload: PublishRhumbsDto): Promise<RhumbsResponseDto> {
@@ -90,8 +95,8 @@ export class RhumbsService {
 
     draft.name = payload.name;
     draft.description = payload.description;
-    draft.geographicAzimuthDeg = payload.geographicAzimuthDeg;
-    draft.magneticAzimuthDeg = payload.magneticAzimuthDeg.toFixed(1);
+    draft.geoAzimuth = payload.geoAzimuth;
+    draft.magAzimuth = payload.magAzimuth.toFixed(1);
     draft.status = 'published';
     draft.formedAt = new Date();
 
@@ -141,12 +146,18 @@ export class RhumbsService {
       throw new NotFoundException();
     }
 
+    const userId = CurrentUser.getInstance().getId();
     const likesCount = await this.rhumbsRepository.countLikes(rhumbs.id);
+    const liked = await this.rhumbsRepository.existsLike(userId, rhumbs.id);
 
-    return this.toResponse(rhumbs, likesCount);
+    return this.toResponse(rhumbs, likesCount, liked ? 1 : 0);
   }
 
-  private toResponse(rhumbs: Rhumbs, likesCount: number): RhumbsResponseDto {
+  private toResponse(
+    rhumbs: Rhumbs,
+    likesCount: number,
+    isLiked: number,
+  ): RhumbsResponseDto {
     return plainToInstance(
       RhumbsResponseDto,
       {
@@ -155,11 +166,12 @@ export class RhumbsService {
         description: rhumbs.description,
         imageUrl: this.minio.buildUrl(rhumbs.imageKey),
         videoUrl: this.minio.buildUrl(rhumbs.videoKey),
-        geographicAzimuthDeg: rhumbs.geographicAzimuthDeg,
-        magneticAzimuthDeg: rhumbs.magneticAzimuthDeg,
+        geoAzimuth: rhumbs.geoAzimuth,
+        magAzimuth: rhumbs.magAzimuth,
         likesCount,
         isCreator:
           rhumbs.creatorId === CurrentUser.getInstance().getId() ? 1 : 0,
+        isLiked,
       },
       { excludeExtraneousValues: true },
     );
