@@ -1,12 +1,34 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { HttpExceptionFilter } from './../src/common/http-exception.filter';
 import { AppModule } from './../src/app.module';
 
+const PUBLISH_BODY = {
+  name: 'Тестовый румб',
+  description: 'Краткое описание',
+  geoAzimuth: 45,
+  magAzimuth: 33.5,
+};
+
 describe('RhumbsController (e2e)', () => {
   let app: INestApplication;
+
+  const login = async (
+    password = 'rhumbs2026',
+  ): Promise<{ status: number; cookie: string }> => {
+    const response = await request(app.getHttpServer() as App)
+      .post('/api/users/login')
+      .send({ login: 'n.vasilev', password });
+
+    const header = response.headers['set-cookie'] as unknown as
+      | string[]
+      | undefined;
+
+    return { status: response.status, cookie: header?.[0] ?? '' };
+  };
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,6 +37,7 @@ describe('RhumbsController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');
+    app.use(cookieParser());
     app.useGlobalFilters(new HttpExceptionFilter());
     app.useGlobalPipes(
       new ValidationPipe({
@@ -58,9 +81,27 @@ describe('RhumbsController (e2e)', () => {
       .expect(400, '');
   });
 
-  it('/api/rhumbs (GET): признак создателя 0 или 1', async () => {
+  it('/api/rhumbs (GET): гость получает нули в признаках', async () => {
     const response = await request(app.getHttpServer() as App)
       .get('/api/rhumbs')
+      .expect(200);
+
+    const rhumbs = response.body as { isCreator: number; isLiked: number }[];
+
+    expect(rhumbs.length).toBeGreaterThan(0);
+
+    for (const item of rhumbs) {
+      expect(item.isCreator).toBe(0);
+      expect(item.isLiked).toBe(0);
+    }
+  });
+
+  it('/api/rhumbs (GET): после входа признаки считаются по сессии', async () => {
+    const { cookie } = await login();
+
+    const response = await request(app.getHttpServer() as App)
+      .get('/api/rhumbs')
+      .set('Cookie', cookie)
       .expect(200);
 
     const rhumbs = response.body as {
@@ -68,8 +109,6 @@ describe('RhumbsController (e2e)', () => {
       isCreator: number;
       isLiked: number;
     }[];
-
-    expect(rhumbs.length).toBeGreaterThan(0);
 
     for (const item of rhumbs) {
       expect([0, 1]).toContain(item.isCreator);
@@ -87,8 +126,11 @@ describe('RhumbsController (e2e)', () => {
   });
 
   it('/api/rhumbs/:id/like (POST): isLiked отражает новое состояние', async () => {
+    const { cookie } = await login();
+
     const liked = await request(app.getHttpServer() as App)
       .post('/api/rhumbs/2/like')
+      .set('Cookie', cookie)
       .send({ value: 1 })
       .expect(200);
 
@@ -96,10 +138,45 @@ describe('RhumbsController (e2e)', () => {
 
     const unliked = await request(app.getHttpServer() as App)
       .post('/api/rhumbs/2/like')
+      .set('Cookie', cookie)
       .send({ value: 0 })
       .expect(200);
 
     expect((unliked.body as { isLiked: number }).isLiked).toBe(0);
+  });
+
+  it('/api/rhumbs/draft/publish (PUT): гостю 403 с пустым телом', () => {
+    return request(app.getHttpServer() as App)
+      .put('/api/rhumbs/draft/publish')
+      .send(PUBLISH_BODY)
+      .expect(403, '');
+  });
+
+  it('/api/users/login (POST): неверный пароль — 403 с пустым телом', async () => {
+    const { status, cookie } = await login('неверный');
+
+    expect(status).toBe(403);
+    expect(cookie).toBe('');
+  });
+
+  it('/api/users/logout (POST): после выхода защищённый метод даёт 403', async () => {
+    const { cookie } = await login();
+
+    await request(app.getHttpServer() as App)
+      .get('/api/rhumbs/draft')
+      .set('Cookie', cookie)
+      .expect(404, '');
+
+    await request(app.getHttpServer() as App)
+      .post('/api/users/logout')
+      .set('Cookie', cookie)
+      .expect(200, '');
+
+    await request(app.getHttpServer() as App)
+      .put('/api/rhumbs/draft/publish')
+      .set('Cookie', cookie)
+      .send(PUBLISH_BODY)
+      .expect(403, '');
   });
 
   it('/api/users (POST): регистрация и занятый логин', async () => {

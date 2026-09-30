@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-export class RegisterUserDto {
-  @ApiProperty({ example: 'i.petrov', maxLength: 64 })
+export class LoginUserDto {
+  @ApiProperty({ example: 'n.vasilev', maxLength: 64 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(64)

@@ -14,6 +14,10 @@ export class TypeORMUsersRepository {
     return this.usersRepository.exists({ where: { login } });
   }
 
+  async findByLogin(login: string): Promise<Users | null> {
+    return this.usersRepository.findOne({ where: { login } });
+  }
+
   async create(login: string, password: string): Promise<Users> {
     return this.usersRepository.save(this.usersRepository.create({ login, password }));
   }

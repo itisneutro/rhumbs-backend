@@ -1,4 +1,4 @@
-# Румбы — JSON API (ЛР-3)
+# Румбы — JSON API (ЛР-4)
 
 Время полёта Boeing-737 NG Лондон–Париж в зависимости от направления ветра.
 Услуги — 8 румбов ветра. Приложение на NestJS отдаёт только JSON, шаблонов нет.
@@ -6,7 +6,7 @@
 ## Запуск
 
 ```bash
-docker compose up -d      # PostgreSQL, Minio, Adminer
+docker compose up -d      # PostgreSQL 18, Redis 7, Minio, Adminer
 npm install
 npm run migrate           # применить миграции TypeORM
 npm run seed              # демонстрационные данные (на пустую базу)
@@ -14,8 +14,10 @@ npm run reset             # вернуть базу к состоянию сид
 npm run start:dev         # http://localhost:3000/api
 ```
 
-Adminer — http://localhost:8081, консоль Minio — http://localhost:9001.
-Параметры базы и Minio берутся из `.env`.
+Adminer (`adminer:6.0.1`) — http://localhost:8081, консоль Minio
+(`minio/minio:RELEASE.2025-09-07T16-13-09Z`) — http://localhost:9001,
+Swagger UI — http://localhost:3000/api/docs (единственная HTML-страница проекта).
+Параметры базы, Minio и Redis берутся из `.env` (`REDIS_HOST`, `REDIS_PORT`).
 
 ### Postman
 
@@ -25,12 +27,40 @@ Adminer — http://localhost:8081, консоль Minio — http://localhost:900
 Коллекция из 10 запросов выполняется по порядку: второй запрос сохраняет id
 созданного румба в переменную `rhumbsId`, её используют запросы 6, 7 и 8.
 
+Первый запрос коллекции — «0. Вход»: он логинится как `n.vasilev` и кладёт куку
+в переменную коллекции `sessionId`, которую защищённые запросы подставляют в
+заголовок `Cookie`.
+
 Прогон из командной строки:
 
 ```bash
 npm run reset
 npx newman run postman/rhumbs.postman_collection.json --working-dir .
 ```
+
+## Показ ЛР-4
+
+1. Открыть Swagger в окне инкогнито: http://localhost:3000/api/docs. Защищённые
+   методы без куки отвечают 403 с пустым телом.
+2. Выполнить там же `POST /api/users/login` с `n.vasilev` / `rhumbs2026` —
+   браузер сохранит куку, и те же методы начнут отвечать 200.
+3. Забрать значение куки: DevTools → Application → Cookies →
+   http://localhost:3000 → `sessionId`.
+4. Импортировать `postman/rhumbs-lab4.postman_collection.json` («Румбы — ЛР-4»),
+   вставить значение в переменную коллекции `sessionId` и пройти пять запросов:
+   список без куки и с кукой (видно разницу в `isCreator` и `isLiked`),
+   публикация гостем — 403, добавление и публикация с кукой — 201 и 200.
+   Working directory Postman — корень репозитория, иначе не найдутся файлы.
+
+Сессии в Redis смотреть так:
+
+```bash
+docker exec -it rhumbs-redis redis-cli KEYS 'session:*'
+docker exec -it rhumbs-redis redis-cli HGETALL session:<sessionId>
+```
+
+В хэше лежат `userId` и `login`, у ключа TTL 3600 с; `POST /api/users/logout`
+удаляет ключ.
 
 ## Методы
 
@@ -46,10 +76,30 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 | DELETE | `/rhumbs/:id` | — | пусто | 200, 400, 404 |
 | POST | `/rhumbs/:id/like` | JSON: `value` (0 или 1) | румб | 200, 400, 404 |
 | POST | `/users` | JSON: `login`, `password` | `{ id, login }` | 201, 400 |
-| POST | `/users/login` | — | пусто | 200 |
-| POST | `/users/logout` | — | пусто | 200 |
+| POST | `/users/login` | JSON: `login`, `password` | `{ id, login }` | 200, 400, 403 |
+| POST | `/users/logout` | — | пусто | 200, 403 |
 
-`/users/login` и `/users/logout` — заглушки под ЛР-4: логики в них нет.
+## Вход и сессии
+
+`POST /users/login` находит пользователя по логину и сверяет пароль через
+`bcrypt.compare`. При успехе создаётся сессия: `crypto.randomUUID()` кладётся в
+Redis хэшем `session:<sessionId>` с полями `userId` и `login`, время жизни ключа
+3600 с. Идентификатор возвращается кукой `sessionId` — `httpOnly`,
+`sameSite: lax`, `maxAge` 1 час. Неверный логин или пароль — 403 с пустым телом,
+без подсказки, что именно не совпало.
+
+`POST /users/logout` удаляет ключ из Redis и очищает куку, отвечает 200 без тела.
+
+Текущий пользователь берётся только из сессии: middleware читает куку, находит
+`userId` в Redis и кладёт его в запрос; без куки или с истёкшей сессией
+запрос считается гостевым. Константы пользователя в коде больше нет.
+
+Вход обязателен для шести методов — `GET /rhumbs/draft`, `POST /rhumbs`,
+`PUT /rhumbs/draft/publish`, `DELETE /rhumbs/:id`, `POST /rhumbs/:id/like` и
+`POST /users/logout`: гостю они отвечают **403 с пустым телом**. Остальные
+открыты всем: `GET /rhumbs`, `GET /rhumbs/feed[/:id]`, `POST /users`,
+`POST /users/login`. Гость получает те же поля румба, но `isCreator` и `isLiked`
+у него всегда 0. Создатель нового черновика проставляется из сессии.
 
 Ограничения: `name` — до 64 символов, `description` — до 512 и при публикации
 обязательно, `geoAzimuth` — целое 0–359, `magAzimuth` —
@@ -82,8 +132,8 @@ id не нужен — черновик ищется по текущему по�
 чтобы нарисовать кнопку лайка в нужном состоянии: в списке он приходит из того
 же запроса подзапросом `EXISTS` по `rhumbs_likes`, для одного румба — проверкой
 `exists` в репозитории; в ответе на лайк показывает уже новое состояние.
-Текущий пользователь задан константой в `src/common/current-user.ts` (id 4),
-авторизация появится в ЛР-4.
+Текущий пользователь определяется сессией (кука `sessionId`), у гостя оба
+признака равны 0.
 
 Ответ пользователя — `{ id, login }`, пароль и его хэш не отдаются никогда.
 
@@ -140,3 +190,4 @@ UNIQUE `uq_rhumbs_likes` на пару (`user_id`, `rhumbs_id`):
   `whitelist` и `forbidNonWhitelisted` отвечает 400.
 - Статус румба (`draft` / `published` / `deleted`), создатель и даты в ответе не
   отдаются. Списки и лента показывают только опубликованные румбы.
+- 403 — вход не выполнен: тело тоже пустое, как у остальных ошибок.

@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { CurrentUser } from '../../../common/current-user';
 import { Rhumbs } from '../../../entities/rhumbs.entity';
 import { PublishRhumbsDto } from '../dto/publish-rhumbs.dto';
 import { RhumbsResponseDto } from '../dto/rhumbs-response.dto';
@@ -21,39 +20,47 @@ export class RhumbsService {
     private readonly minio: MinioService,
   ) {}
 
-  async findPublished(minAzimuth?: number): Promise<RhumbsResponseDto[]> {
-    const rows = await this.rhumbsRepository.findPublished(
-      CurrentUser.getInstance().getId(),
-      minAzimuth,
-    );
+  async findPublished(
+    userId: number,
+    minAzimuth?: number,
+  ): Promise<RhumbsResponseDto[]> {
+    const rows = await this.rhumbsRepository.findPublished(userId, minAzimuth);
 
     return rows.map(({ rhumbs, likesCount, isLiked }) =>
-      this.toResponse(rhumbs, likesCount, isLiked),
+      this.toResponse(rhumbs, likesCount, isLiked, userId),
     );
   }
 
-  async findFeed(id?: number, next?: boolean): Promise<RhumbsResponseDto> {
+  async findFeed(
+    userId: number,
+    id?: number,
+    next?: boolean,
+  ): Promise<RhumbsResponseDto> {
     if (id === undefined) {
-      return this.withLikes(await this.rhumbsRepository.findFirstPublished());
+      return this.withLikes(
+        await this.rhumbsRepository.findFirstPublished(),
+        userId,
+      );
     }
 
     const rhumbs = next
       ? await this.rhumbsRepository.findNextPublished(id)
       : await this.rhumbsRepository.findPublishedById(id);
 
-    return this.withLikes(rhumbs);
+    return this.withLikes(rhumbs, userId);
   }
 
-  async findDraft(): Promise<RhumbsResponseDto> {
-    const draft = await this.rhumbsRepository.findDraftByUser(
-      CurrentUser.getInstance().getId(),
-    );
+  async findDraft(userId: number): Promise<RhumbsResponseDto> {
+    const draft = await this.rhumbsRepository.findDraftByUser(userId);
 
-    return this.withLikes(draft);
+    return this.withLikes(draft, userId);
   }
 
-  async createDraft(name: string, files: RhumbsFiles): Promise<RhumbsResponseDto> {
-    const userId = CurrentUser.getInstance().getId();
+  async createDraft(
+    userId: number,
+    name: string,
+    files: RhumbsFiles,
+  ): Promise<RhumbsResponseDto> {
     const existing = await this.rhumbsRepository.findDraftByUser(userId);
 
     if (existing) {
@@ -81,13 +88,14 @@ export class RhumbsService {
       await this.rhumbsRepository.save(draft);
     }
 
-    return this.toResponse(draft, 0, 0);
+    return this.toResponse(draft, 0, 0, userId);
   }
 
-  async publishDraft(payload: PublishRhumbsDto): Promise<RhumbsResponseDto> {
-    const draft = await this.rhumbsRepository.findDraftByUser(
-      CurrentUser.getInstance().getId(),
-    );
+  async publishDraft(
+    userId: number,
+    payload: PublishRhumbsDto,
+  ): Promise<RhumbsResponseDto> {
+    const draft = await this.rhumbsRepository.findDraftByUser(userId);
 
     if (!draft) {
       throw new NotFoundException();
@@ -102,13 +110,13 @@ export class RhumbsService {
 
     const published = await this.rhumbsRepository.save(draft);
 
-    return this.withLikes(published);
+    return this.withLikes(published, userId);
   }
 
-  async markDeleted(id: number): Promise<void> {
+  async markDeleted(userId: number, id: number): Promise<void> {
     const published = await this.rhumbsRepository.findPublishedByIdAndUser(
       id,
-      CurrentUser.getInstance().getId(),
+      userId,
     );
 
     if (!published) {
@@ -120,14 +128,17 @@ export class RhumbsService {
     await this.rhumbsRepository.save(published);
   }
 
-  async setLike(id: number, value: number): Promise<RhumbsResponseDto> {
+  async setLike(
+    userId: number,
+    id: number,
+    value: number,
+  ): Promise<RhumbsResponseDto> {
     const rhumbs = await this.rhumbsRepository.findPublishedById(id);
 
     if (!rhumbs) {
       throw new NotFoundException();
     }
 
-    const userId = CurrentUser.getInstance().getId();
     const like = await this.rhumbsRepository.findLike(userId, id);
 
     if (value === 1 && !like) {
@@ -138,25 +149,28 @@ export class RhumbsService {
       await this.rhumbsRepository.removeLike(like);
     }
 
-    return this.withLikes(rhumbs);
+    return this.withLikes(rhumbs, userId);
   }
 
-  private async withLikes(rhumbs: Rhumbs | null): Promise<RhumbsResponseDto> {
+  private async withLikes(
+    rhumbs: Rhumbs | null,
+    userId: number,
+  ): Promise<RhumbsResponseDto> {
     if (!rhumbs) {
       throw new NotFoundException();
     }
 
-    const userId = CurrentUser.getInstance().getId();
     const likesCount = await this.rhumbsRepository.countLikes(rhumbs.id);
     const liked = await this.rhumbsRepository.existsLike(userId, rhumbs.id);
 
-    return this.toResponse(rhumbs, likesCount, liked ? 1 : 0);
+    return this.toResponse(rhumbs, likesCount, liked ? 1 : 0, userId);
   }
 
   private toResponse(
     rhumbs: Rhumbs,
     likesCount: number,
     isLiked: number,
+    userId: number,
   ): RhumbsResponseDto {
     return plainToInstance(
       RhumbsResponseDto,
@@ -169,8 +183,7 @@ export class RhumbsService {
         geoAzimuth: rhumbs.geoAzimuth,
         magAzimuth: rhumbs.magAzimuth,
         likesCount,
-        isCreator:
-          rhumbs.creatorId === CurrentUser.getInstance().getId() ? 1 : 0,
+        isCreator: rhumbs.creatorId === userId ? 1 : 0,
         isLiked,
       },
       { excludeExtraneousValues: true },

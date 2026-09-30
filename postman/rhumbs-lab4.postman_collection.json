@@ -1,0 +1,95 @@
+{
+  "info": {
+    "name": "Румбы — ЛР-4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "sessionId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Список без куки",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs?minAzimuth=90",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs"],
+          "query": [{ "key": "minAzimuth", "value": "90" }]
+        }
+      }
+    },
+    {
+      "name": "2. Список с кукой",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Cookie", "value": "sessionId={{sessionId}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs?minAzimuth=90",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs"],
+          "query": [{ "key": "minAzimuth", "value": "90" }]
+        }
+      }
+    },
+    {
+      "name": "3. Публикация гостем",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "options": { "raw": { "language": "json" } },
+          "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geoAzimuth\": 45,\n  \"magAzimuth\": 33.5\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/draft/publish",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "draft", "publish"]
+        }
+      }
+    },
+    {
+      "name": "4. Добавление с кукой",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Cookie", "value": "sessionId={{sessionId}}" }],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "Тестовый румб", "type": "text" },
+            { "key": "image", "src": "postman/files/rhumbs-demo.jpg", "type": "file" },
+            { "key": "video", "src": "postman/files/rhumbs-demo.mp4", "type": "file" }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs"]
+        }
+      }
+    },
+    {
+      "name": "5. Публикация с кукой",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Cookie", "value": "sessionId={{sessionId}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "options": { "raw": { "language": "json" } },
+          "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geoAzimuth\": 45,\n  \"magAzimuth\": 33.5\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/rhumbs/draft/publish",
+          "host": ["{{baseUrl}}"],
+          "path": ["rhumbs", "draft", "publish"]
+        }
+      }
+    }
+  ]
+}

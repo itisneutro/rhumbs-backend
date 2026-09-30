@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { RhumbsModule } from './modules/rhumbs/rhumbs.module';
 import { UsersModule } from './modules/users/users.module';
+import { SessionMiddleware } from './common/session.middleware';
 
 @Module({
   imports: [
@@ -25,4 +26,8 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(SessionMiddleware).forRoutes('*');
+  }
+}

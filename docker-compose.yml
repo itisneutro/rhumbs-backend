@@ -2,7 +2,7 @@ name: rhumbs
 
 services:
   minio:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: rhumbs-minio
     command: server /data --console-address ":9001"
     environment:
@@ -13,6 +13,12 @@ services:
       - "9001:9001"
     volumes:
       - rhumbs-data:/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: rhumbs-redis
+    ports:
+      - "6379:6379"
 
   postgres:
     image: postgres:18-alpine
@@ -27,7 +33,7 @@ services:
       - rhumbs-db:/var/lib/postgresql
 
   adminer:
-    image: adminer:latest
+    image: adminer:6.0.1
     container_name: rhumbs-adminer
     ports:
       - "8081:8080"
