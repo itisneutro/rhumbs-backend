@@ -131,7 +131,7 @@ export class RhumbsService {
   async setLike(
     userId: number,
     id: number,
-    value: number,
+    isLiked: number,
   ): Promise<RhumbsResponseDto> {
     const rhumbs = await this.rhumbsRepository.findPublishedById(id);
 
@@ -141,11 +141,11 @@ export class RhumbsService {
 
     const like = await this.rhumbsRepository.findLike(userId, id);
 
-    if (value === 1 && !like) {
+    if (isLiked === 1 && !like) {
       await this.rhumbsRepository.addLike(userId, id);
     }
 
-    if (value === 0 && like) {
+    if (isLiked === 0 && like) {
       await this.rhumbsRepository.removeLike(like);
     }
 

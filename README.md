@@ -74,7 +74,7 @@ docker exec -it rhumbs-redis redis-cli HGETALL session:<sessionId>
 | POST | `/rhumbs` | `multipart/form-data`: `name`, `image`, `video` | румб | 201, 400 |
 | PUT | `/rhumbs/draft/publish` | JSON: `name`, `description`, `geoAzimuth`, `magAzimuth` | румб | 200, 400, 404 |
 | DELETE | `/rhumbs/:id` | — | пусто | 200, 400, 404 |
-| POST | `/rhumbs/:id/like` | JSON: `value` (0 или 1) | румб | 200, 400, 404 |
+| POST | `/rhumbs/:id/like` | JSON: `isLiked` (1 — поставить, 0 — снять) | румб | 200, 400, 404 |
 | POST | `/users` | JSON: `login`, `password` | `{ id, login }` | 201, 400 |
 | POST | `/users/login` | JSON: `login`, `password` | `{ id, login }` | 200, 400, 403 |
 | POST | `/users/logout` | — | пусто | 200, 403 |

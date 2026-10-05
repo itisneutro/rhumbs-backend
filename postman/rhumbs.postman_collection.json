@@ -254,7 +254,7 @@
               "language": "json"
             }
           },
-          "raw": "{\n  \"value\": 1\n}"
+          "raw": "{\n  \"isLiked\": 1\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/rhumbs/{{rhumbsId}}/like",

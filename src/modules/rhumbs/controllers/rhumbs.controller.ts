@@ -171,7 +171,9 @@ export class RhumbsController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(SessionGuard)
   @ApiCookieAuth(SESSION_COOKIE)
-  @ApiOperation({ summary: 'Лайк опубликованного румба: 1 ставит, 0 снимает' })
+  @ApiOperation({
+    summary: 'Лайк опубликованного румба: isLiked 1 ставит, 0 снимает',
+  })
   @ApiResponse({ status: 200, description: 'Румб с новым likesCount', type: RhumbsResponseDto })
   @ApiResponse({ status: 400, description: 'Неверное значение или id' })
   @ApiResponse({ status: 403, description: 'Вход не выполнен' })
@@ -181,6 +183,6 @@ export class RhumbsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() payload: LikeRhumbsDto,
   ): Promise<RhumbsResponseDto> {
-    return this.rhumbs.setLike(userId, id, payload.value);
+    return this.rhumbs.setLike(userId, id, payload.isLiked);
   }
 }

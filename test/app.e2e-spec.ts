@@ -131,7 +131,7 @@ describe('RhumbsController (e2e)', () => {
     const liked = await request(app.getHttpServer() as App)
       .post('/api/rhumbs/2/like')
       .set('Cookie', cookie)
-      .send({ value: 1 })
+      .send({ isLiked: 1 })
       .expect(200);
 
     expect((liked.body as { isLiked: number }).isLiked).toBe(1);
@@ -139,7 +139,7 @@ describe('RhumbsController (e2e)', () => {
     const unliked = await request(app.getHttpServer() as App)
       .post('/api/rhumbs/2/like')
       .set('Cookie', cookie)
-      .send({ value: 0 })
+      .send({ isLiked: 0 })
       .expect(200);
 
     expect((unliked.body as { isLiked: number }).isLiked).toBe(0);
