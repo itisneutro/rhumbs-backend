@@ -3,10 +3,6 @@
     "name": "Румбы — ЛР-4",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000/api" },
-    { "key": "sessionId", "value": "" }
-  ],
   "item": [
     {
       "name": "1. Список без куки",
@@ -14,9 +10,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/rhumbs?minAzimuth=90",
-          "host": ["{{baseUrl}}"],
-          "path": ["rhumbs"],
+          "raw": "http://localhost:3000/api/rhumbs?minAzimuth=90",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "rhumbs"],
           "query": [{ "key": "minAzimuth", "value": "90" }]
         }
       }
@@ -25,11 +23,13 @@
       "name": "2. Список с кукой",
       "request": {
         "method": "GET",
-        "header": [{ "key": "Cookie", "value": "sessionId={{sessionId}}" }],
+        "header": [{ "key": "Cookie", "value": "sessionId=ВСТАВИТЬ_ИЗ_APPLICATION" }],
         "url": {
-          "raw": "{{baseUrl}}/rhumbs?minAzimuth=90",
-          "host": ["{{baseUrl}}"],
-          "path": ["rhumbs"],
+          "raw": "http://localhost:3000/api/rhumbs?minAzimuth=90",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "rhumbs"],
           "query": [{ "key": "minAzimuth", "value": "90" }]
         }
       }
@@ -45,9 +45,11 @@
           "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geoAzimuth\": 45,\n  \"magAzimuth\": 33.5\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/rhumbs/draft/publish",
-          "host": ["{{baseUrl}}"],
-          "path": ["rhumbs", "draft", "publish"]
+          "raw": "http://localhost:3000/api/rhumbs/draft/publish",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "rhumbs", "draft", "publish"]
         }
       }
     },
@@ -55,7 +57,7 @@
       "name": "4. Добавление с кукой",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Cookie", "value": "sessionId={{sessionId}}" }],
+        "header": [{ "key": "Cookie", "value": "sessionId=ВСТАВИТЬ_ИЗ_APPLICATION" }],
         "body": {
           "mode": "formdata",
           "formdata": [
@@ -65,9 +67,11 @@
           ]
         },
         "url": {
-          "raw": "{{baseUrl}}/rhumbs",
-          "host": ["{{baseUrl}}"],
-          "path": ["rhumbs"]
+          "raw": "http://localhost:3000/api/rhumbs",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "rhumbs"]
         }
       }
     },
@@ -77,7 +81,7 @@
         "method": "PUT",
         "header": [
           { "key": "Content-Type", "value": "application/json" },
-          { "key": "Cookie", "value": "sessionId={{sessionId}}" }
+          { "key": "Cookie", "value": "sessionId=ВСТАВИТЬ_ИЗ_APPLICATION" }
         ],
         "body": {
           "mode": "raw",
@@ -85,9 +89,11 @@
           "raw": "{\n  \"name\": \"Тестовый румб\",\n  \"description\": \"Краткое описание\",\n  \"geoAzimuth\": 45,\n  \"magAzimuth\": 33.5\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/rhumbs/draft/publish",
-          "host": ["{{baseUrl}}"],
-          "path": ["rhumbs", "draft", "publish"]
+          "raw": "http://localhost:3000/api/rhumbs/draft/publish",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "rhumbs", "draft", "publish"]
         }
       }
     }

@@ -24,19 +24,18 @@ Swagger UI — http://localhost:3000/api/docs (единственная HTML-с�
 Импортировать `postman/rhumbs.postman_collection.json` (Collection v2.1).
 В настройках Postman указать **Working directory** — корень репозитория, иначе
 запрос с файлами не найдёт `postman/files/rhumbs-demo.jpg` и `.mp4`.
-Коллекция из 10 запросов выполняется по порядку: второй запрос сохраняет id
-созданного румба в переменную `rhumbsId`, её используют запросы 6, 7 и 8.
 
-Первый запрос коллекции — «0. Вход»: он логинится как `n.vasilev` и кладёт куку
-в переменную коллекции `sessionId`, которую защищённые запросы подставляют в
-заголовок `Cookie`.
+Переменных в коллекциях нет: адреса записаны полностью
+(`http://localhost:3000/api/...`), id — числами из сида. Запросы 6, 7 и 8
+работают с румбом 2 «Северо-восточный»: он опубликован, его автор `n.vasilev`,
+лайка `n.vasilev` на нём в сиде нет. Удаление из запроса 8 откатывает
+`npm run reset`.
 
-Прогон из командной строки:
-
-```bash
-npm run reset
-npx newman run postman/rhumbs.postman_collection.json --working-dir .
-```
+Запросы, которым нужен вход (черновик, добавление, публикация, лайк, удаление,
+выход), несут явный заголовок `Cookie: sessionId=ВСТАВИТЬ_ИЗ_APPLICATION`.
+Перед прогоном войти как `n.vasilev` / `rhumbs2026` (например, в Swagger) и
+заменить `ВСТАВИТЬ_ИЗ_APPLICATION` значением куки `sessionId` из DevTools →
+Application → Cookies → http://localhost:3000.
 
 ## Показ ЛР-4
 
@@ -47,7 +46,8 @@ npx newman run postman/rhumbs.postman_collection.json --working-dir .
 3. Забрать значение куки: DevTools → Application → Cookies →
    http://localhost:3000 → `sessionId`.
 4. Импортировать `postman/rhumbs-lab4.postman_collection.json` («Румбы — ЛР-4»),
-   вставить значение в переменную коллекции `sessionId` и пройти пять запросов:
+   вставить значение в заголовок `Cookie` запросов 2, 4 и 5 вместо
+   `ВСТАВИТЬ_ИЗ_APPLICATION` и пройти пять запросов:
    список без куки и с кукой (видно разницу в `isCreator` и `isLiked`),
    публикация гостем — 403, добавление и публикация с кукой — 201 и 200.
    Working directory Postman — корень репозитория, иначе не найдутся файлы.
@@ -61,6 +61,21 @@ docker exec -it rhumbs-redis redis-cli HGETALL session:<sessionId>
 
 В хэше лежат `userId` и `login`, у ключа TTL 3600 с; `POST /api/users/logout`
 удаляет ключ.
+
+## Активные сессии в Redis
+
+Lua-скрипт `scripts/rhumbs-sessions.lua` перебирает ключи `session:*` и для
+каждого возвращает ключ, `userId` и `login`. Запуск:
+
+```bash
+npm run redis:sessions
+```
+
+Пример вывода после входа `n.vasilev`:
+
+```
+session:4c8fc159-9075-49c3-90f9-c5494d93a53f userId=4 login=n.vasilev
+```
 
 ## Методы
 

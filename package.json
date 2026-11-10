@@ -21,7 +21,8 @@
     "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json",
     "migrate": "ts-node scripts/migrate.ts",
     "seed": "docker exec -i rhumbs-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"' < scripts/seed.sql",
-    "reset": "docker exec -i rhumbs-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"' < scripts/reset.sql"
+    "reset": "docker exec -i rhumbs-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"' < scripts/reset.sql",
+    "redis:sessions": "docker exec -i rhumbs-redis redis-cli EVAL \"$(cat scripts/rhumbs-sessions.lua)\" 0"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
